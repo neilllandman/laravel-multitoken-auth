@@ -76,6 +76,17 @@ class ApiAuthController extends Controller
 
     /**
      * @param Request $request
+     * @return mixed
+     */
+    public function logoutAll(Request $request)
+    {
+        $this->guard->logout();
+        $count = $request->user()->apiTokens()->delete();
+        return response()->json(['count' => $count, 'success' => 1]);
+    }
+
+    /**
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
