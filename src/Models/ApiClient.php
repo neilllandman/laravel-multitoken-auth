@@ -4,13 +4,14 @@ namespace Landman\MultiTokenAuth\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Traits\HasUuidKey;
 
 /**
  * Class ApiToken
  * @package App
  */
-class ClientId extends Model
+class ApiClient extends Model
 {
 
     use SoftDeletes;
@@ -30,8 +31,17 @@ class ClientId extends Model
      */
     public static function make($name){
         return self::create([
-           'name' => $name,
-           'value' => self::newId(),
+            'name' => $name,
+            'value' => self::newId(),
         ]);
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getTable()
+    {
+        parent::getTable();
+        return Config::get('multipletokens.tables.api_clients');
     }
 }

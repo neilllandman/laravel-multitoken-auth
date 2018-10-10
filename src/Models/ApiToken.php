@@ -223,4 +223,14 @@ class ApiToken extends Model
     {
         return $this->delete();
     }
+
+
+    /**
+     * @return mixed|string
+     */
+    public function getTable()
+    {
+        parent::getTable();
+        return Config::get('multipletokens.tables.api_tokens');
+    }
 }

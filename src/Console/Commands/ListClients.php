@@ -3,7 +3,7 @@
 namespace Landman\MultiTokenAuth\Console\Commands;
 
 use Illuminate\Console\Command;
-use Landman\MultiTokenAuth\Models\ClientId;
+use Landman\MultiTokenAuth\Models\ApiClient;
 
 /**
  * Class MakeClientId
@@ -43,6 +43,6 @@ class ListClients extends Command
      */
     public function handle()
     {
-        $this->table(['name', 'value'], ClientId::all(['name', 'value'])->toArray());
+        $this->table(['name', 'value'], ApiClient::all(['name', 'value'])->toArray());
     }
 }

@@ -3,13 +3,13 @@
 namespace Landman\MultiTokenAuth\Console\Commands;
 
 use Illuminate\Console\Command;
-use Landman\MultiTokenAuth\Models\ClientId;
+use Landman\MultiTokenAuth\Models\ApiClient;
 
 /**
  * Class MakeClientId
  * @package App\Console\Commands
  */
-class MakeClientId extends Command
+class MakeApiClient extends Command
 {
     /**
      * The name and signature of the console command.
@@ -43,7 +43,7 @@ class MakeClientId extends Command
      */
     public function handle()
     {
-        $clientId = ClientId::make($this->argument('name'));
+        $clientId = ApiClient::make($this->argument('name'));
 //$this->info("{$clientId");
         $this->info("Client Id: {$clientId->value}");
     }
