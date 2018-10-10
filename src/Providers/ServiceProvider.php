@@ -4,7 +4,7 @@ namespace Landman\MultiTokenAuth\Providers;
 
 use App\Services\Auth\TokensGuard;
 use App\Services\Auth\TokensUserProvider;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
  * Class AuthServiceProvider
  * @package App\Providers
  */
-class AuthServiceProvider extends ServiceProvider
+class ServiceProvider extends AuthServiceProvider
 {
     /**
      * Register any authentication / authorization services.
