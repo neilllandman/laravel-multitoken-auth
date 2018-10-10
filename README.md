@@ -46,31 +46,42 @@ Login via route:
 with params: 
 
 
-    [
-        "client_id" => "id created via php artisan",
-        "email" => "email",
-        "password" => "pw"
-    ]
+    {
+        "client_id": "id created via php artisan",
+        "email": "email",
+        "password": "pw"
+    }
 
 Response example: 
     
      {
         "user": {
-        "id": 1,
+            "id": 1,
             "name": "Mrs. Jailyn Boehm",
             "email": "zemlak.royce@example.org",
             "email_verified_at": "2018-10-10 12:09:12",
             "created_at": "2018-10-10 12:09:12",
             "updated_at": "2018-10-10 12:09:12"
-        },
+            },
         "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
      }
     
 
 Call authenticated routes using returned token in bearer token authorization header
 
-Ex headers: <code>Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV</code>
+Example: <code>/api/auth/user</code>
+Headers: <code>Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV</code>
 
+Response: 
+
+     {
+        "id": 1,
+        "name": "Mrs. Jailyn Boehm",
+        "email": "zemlak.royce@example.org",
+        "email_verified_at": "2018-10-10 12:09:12",
+        "created_at": "2018-10-10 12:09:12",
+        "updated_at": "2018-10-10 12:09:12"
+     }
 
 
 
