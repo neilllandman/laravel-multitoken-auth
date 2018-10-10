@@ -1,5 +1,5 @@
 # Multiple Tokens
-
+#Install
 (Full documentation to follow some day)
 
 Add the following at the bottom of your composer.json to access the repo
@@ -17,17 +17,13 @@ then run
 
 <code>composer require neilllandman/laravel-multitoken-auth</code>
 
-Run migrations:
+Config:
+
+use <code>php artisan vendor:publish</code> to publish config/multipletokens.php
+
+Run migrations: (edit config to change table names if you want)
+
 <code>php artisan migrate</code>
-
-Create API client ids: 
-
-<code>php artisan landman:tokens:make-client ClientName</code>
-
-List Client Ids: 
-
-<code>php artisan landman:tokens:list-clients</code>
-
 
 Edit config/auth.php:
 
@@ -44,9 +40,19 @@ Add trait to User model:
 
 <code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
 
+#Commands
+
+Create API client ids: 
+
+<code>php artisan landman:tokens:make-client ClientName</code>
+
+List Client Ids: 
+
+<code>php artisan landman:tokens:list-clients</code>
+
 #Usage
 
-Login via route:
+Login via route: (edit config/multipletokens.php to change default validation if you want)
 
 <code>/api/auth/login</code>
 
