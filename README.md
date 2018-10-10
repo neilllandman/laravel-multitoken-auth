@@ -1,9 +1,8 @@
 # Multiple Tokens
-#Install
 (Full documentation to follow some day)
+#Install
 
 Add the following at the bottom of your composer.json to access the repo
-
 
     "repositories": [
         {
@@ -14,16 +13,13 @@ Add the following at the bottom of your composer.json to access the repo
 
 
 then run 
+<br><code>composer require neilllandman/laravel-multitoken-auth</code>
 
-<code>composer require neilllandman/laravel-multitoken-auth</code>
-
-Config:
-
-use <code>php artisan vendor:publish</code> to publish config/multipletokens.php
+Publish config/multipletokens.php file if you want to change the table names and default login validation.
+<br><code>php artisan vendor:publish</code>
 
 Run migrations: (edit config to change table names if you want)
-
-<code>php artisan migrate</code>
+<br><code>php artisan migrate</code>
 
 Edit config/auth.php:
 
@@ -37,24 +33,20 @@ Edit config/auth.php:
 
 
 Add trait to User model:
-
-<code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
+<br><code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
 
 #Commands
 
 Create API client ids: 
-
-<code>php artisan landman:tokens:make-client ClientName</code>
+<br><code>php artisan landman:tokens:make-client ClientName</code>
 
 List Client Ids: 
-
-<code>php artisan landman:tokens:list-clients</code>
+<br><code>php artisan landman:tokens:list-clients</code>
 
 #Usage
 
-Login via route: (edit config/multipletokens.php to change default validation if you want)
-
-<code>/api/auth/login</code>
+Login via route:
+<br><code>/api/auth/login</code>
 
 with params: 
 
@@ -83,6 +75,7 @@ Response example:
 Call authenticated routes using returned token in bearer token authorization header
 
 Example: <code>/api/auth/user</code>
+<br>
 Headers: <code>Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV</code>
 
 Response: 
