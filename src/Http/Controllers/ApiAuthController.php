@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
+use Landman\MultiTokenAuth\Models\ApiClient;
 
 /**
  * Class ApiAuthController
@@ -46,16 +47,7 @@ class ApiAuthController extends Controller
 
         if ($this->config['use-client-id'] === true) {
 
-            $clientIds = array_filter(
-                array_merge(
-                    [$this->config['client-id']],
-                    $this->config['client-ids']
-                )
-            );
-
-            if (empty($clientIds)) {
-                return response()->json(['message' => Lang::get('auth.failed')], 401);
-            }
+            $clientIds = ApiClient::pluck('value')->toArray();
 
             $this->validate($request, [
                 'client_id' => [
@@ -63,7 +55,7 @@ class ApiAuthController extends Controller
                     Rule::in($clientIds)
                 ]
             ], [
-                'client_id' => 'Invalid client id',
+                'client_id' => 'Invalid client id.',
             ]);
         }
 

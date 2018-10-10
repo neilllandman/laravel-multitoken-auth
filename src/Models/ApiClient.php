@@ -3,7 +3,6 @@
 namespace Landman\MultiTokenAuth\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Traits\HasUuidKey;
 
@@ -13,8 +12,6 @@ use Landman\MultiTokenAuth\Traits\HasUuidKey;
  */
 class ApiClient extends Model
 {
-
-    use SoftDeletes;
     use HasUuidKey;
 
     /** @var bool */
