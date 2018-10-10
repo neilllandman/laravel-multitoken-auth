@@ -2,7 +2,7 @@
 
 (Full documentation to follow some day)
 
-Add the following to your composer.json:
+Add the following at the bottom of your composer.json to access the repo
 
 
     "repositories": [
@@ -13,7 +13,7 @@ Add the following to your composer.json:
     ]
 
 
-Install via Composer:
+then run 
 
 <code>composer require neilllandman/laravel-multitoken-auth</code>
 
