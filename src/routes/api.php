@@ -1,7 +1,7 @@
 <?php
 Route::group(['prefix' => 'api'], function () {
 
-    Route::group(['prefix' => 'auth', 'namespace' => 'Landman\\MultiTokenAuth'], function () {
+    Route::group(['prefix' => 'auth', 'namespace' => 'Landman\\MultiTokenAuth\\Http\\Controllers'], function () {
         Route::post('login', 'ApiAuthController@login');
         Route::group(['prefix' => 'token'], function () {
             Route::post('refresh', 'ApiAuthController@refreshToken');

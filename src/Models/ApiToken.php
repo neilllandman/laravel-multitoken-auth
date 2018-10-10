@@ -1,11 +1,7 @@
 <?php
 
-namespace Landman\MultiTokenAuth;
+namespace Landman\MultiTokenAuth\Models;
 
-use App\Traits\Encryptable;
-use App\Traits\HasUuidKey;
-use App\Traits\PrettyDateSerializable;
-use App\Traits\SimpleSearchable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,15 +15,10 @@ class ApiToken extends Model
 {
 
     use SoftDeletes;
-    use SimpleSearchable;
-    use PrettyDateSerializable;
     use HasUuidKey;
 
     /** @var bool */
     public static $snakeAttributes = false;
-
-    /** @var bool */
-    protected $usePrettyDate = false;
 
     /** @var string */
     protected $keyType = 'string';
@@ -37,9 +28,6 @@ class ApiToken extends Model
 
     /**  */
     const TOKEN_LENGTH = 60;
-
-    /** @var array */
-    protected $encryptable = [];
 
     /** @var array */
     protected $casts = [

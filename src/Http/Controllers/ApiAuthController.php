@@ -1,6 +1,6 @@
 <?php
 
-namespace Landman\MultiTokenAuth;
+namespace Landman\MultiTokenAuth\Http\Controllers;
 
 use App\ApiToken;
 use App\Http\Controllers\Controller;
