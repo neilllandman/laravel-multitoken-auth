@@ -16,7 +16,7 @@ class DeleteClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:rm-client {clientId}';
+    protected $signature = 'landman:tokens:delete-client {clientId}';
 
     /**
      * The console command description.

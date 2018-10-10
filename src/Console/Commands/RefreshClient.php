@@ -50,6 +50,7 @@ class RefreshClient extends Command
             $client = ApiClient::find($this->argument('clientId'));
             if ($client) {
                 $client->remake();
+                $this->line("Client updated!");
                 $this->table(['ID', 'Name', 'Api Client ID'], [ApiClient::latest()->first(['id', 'name', 'value'])->toArray()]);
             } else {
                 $this->error("No client with ID {$this->argument('clientId')} found!");

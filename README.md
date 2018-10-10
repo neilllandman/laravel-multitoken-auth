@@ -34,16 +34,31 @@ Edit config/auth.php:
 Add trait to User model:
 <br><code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
 
-<h2>Commands</h2>
+<h2>Managing Client IDs</h2>
 
-Create API client ids: 
-<br><code>php artisan landman:tokens:make-client ClientName</code>
+You can manage clients by using the artisan commands
 
-List Client Ids: 
+
+Create API client ID: 
+<br><code>php artisan landman:tokens:make-client {Name}</code>
+
+List Client IDs: 
 <br><code>php artisan landman:tokens:list-clients</code>
 
-List Client Ids: 
-<br><code>php artisan landman:tokens:list-clients</code>
+    +--------------------------------------+---------+--------------------------------------+
+    | Id                                   | Name    | Api Client ID                        |
+    +--------------------------------------+---------+--------------------------------------+
+    | 577e1bbb-e002-c000-a558-dae66220a70b | Android | 577e1bbb-dfd7-0000-8b28-e54c536a9738 |
+    | 577e1bbf-ef3e-8000-a4fb-9852f7cb6cc3 | iOS     | 577e1bbf-ef19-0000-bb59-97193ffe088c |
+    +--------------------------------------+---------+--------------------------------------+
+
+
+Delete a Client: 
+<br><code>php artisan landman:tokens:delete-client {ID}</code>
+
+Refresh a Client (this will reset the 'Api Client ID' value): 
+<br><code>php artisan landman:tokens:refresh-client {ID}</code>
+
 
 <h2>Usage</h2>
 
