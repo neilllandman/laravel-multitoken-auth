@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'model' => 'App\\User',
+    'username' => 'email',
+
     'tables' => [
         'api_clients' => 'api_clients',
         'api_tokens' => 'api_tokens'

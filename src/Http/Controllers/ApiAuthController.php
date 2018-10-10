@@ -4,7 +4,6 @@ namespace Landman\MultiTokenAuth\Http\Controllers;
 
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Routing\Controller;
-use App\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +38,7 @@ class ApiAuthController extends Controller
     {
         $this->guard = Auth::guard('api');
         $this->config = Config::get('multipletokens');
+        $this->user = app()->make($this->config['model']);
     }
 
     /**
@@ -90,7 +90,7 @@ class ApiAuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::create([
+        $user = $this->user->create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
@@ -113,11 +113,11 @@ class ApiAuthController extends Controller
     /**
      * Build response for successful login, registration and token refresh
      *
-     * @param User $user
+     * @param $user
      * @param ApiToken $apiToken
      * @return \Illuminate\Http\JsonResponse
      */
-    private function authenticationSuccessful(User $user, ApiToken $apiToken)
+    private function authenticationSuccessful($user, ApiToken $apiToken)
     {
         $user->makeHidden(['deleted_at']);
 
@@ -126,7 +126,7 @@ class ApiAuthController extends Controller
             $refresh_token = $apiToken->refresh_token;
             $expires_at = $apiToken->expires_at;
         }
-        
+
         return response()->json(compact('user', 'token', 'refresh_token', 'expires_at'));
     }
 

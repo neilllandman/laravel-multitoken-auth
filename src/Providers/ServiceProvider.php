@@ -27,13 +27,13 @@ class ServiceProvider extends AuthServiceProvider
     {
         // add custom api guard provider
         Auth::provider('token-users', function ($app, array $config) {
-            return new TokensUserProvider($app->make('App\User'));
+            return new TokensUserProvider($app->make(Config::get('multipletokens.model')));
         });
 
         // add custom api guard
         Auth::extend('multi-tokens', function ($app, $name, array $config) {
             return new TokensGuard(
-                new TokensUserProvider($app->make('App\User')),
+                new TokensUserProvider($app->make(Config::get('multipletokens.model'))),
                 $app->make('request'),
                 'api_token',
                 'api_token',
