@@ -17,10 +17,7 @@ Add the following at the bottom of your composer.json to access the repo
 then run 
 <br><code>composer require neilllandman/laravel-multitoken-auth</code>
 
-Publish config/multipletokens.php file if you want to change the table names and default login validation.
-<br><code>php artisan vendor:publish</code>
-
-Run migrations: (edit config to change table names if you want)
+Run migrations:
 <br><code>php artisan migrate</code>
 
 Edit config/auth.php:
@@ -97,7 +94,7 @@ Response:
 <h2>Models</h2>
 The user's api tokens can be retrieved via the <code>$user->apiTokens()</code> relationship.
 
-To manually issue an ApiToken to a user, the <code>$user->issueToken()</code> method can be used. This method returns an instance of \Landman\MultiTokenAuth\Models\ApiToken
+To manually issue an ApiToken to a user, the <code>$user->issueToken()</code> method can be used. This method returns an instance of <code>\Landman\MultiTokenAuth\Models\ApiToken</code>.
 
 To further validate if a user can access the API, you can override the <code>canAccessApi()</code> method available from the <code>HasMultipleApiTokens</code> trait.
 
@@ -107,3 +104,38 @@ For example, if you would like to restrict access to your API to allow only user
     {
         return $this->hasRole(['consumer', 'vendor']);
     }
+
+
+<h2>Configuration</h2>
+
+
+Publish config/multipletokens.php.
+<br><code>php artisan vendor:publish</code>
+
+<h4>Available configuration options</h4>
+<table>
+<thead><tr><th>Name</th><th>Description</th><th>Default</th><tr></thead>
+<tbody>
+<tr>
+<td>model</td>
+<td>The class of the eloquent user model to use.</td>
+<td>App\User</td>
+</tr>
+<tr>
+<td>username</td>
+<td>The username column of the model.</td>
+<td>email</td>
+</tr>
+<tr>
+<td>login-validation</td>
+<td>The validation array to use when logging in.</td>
+<td>*See validation</td>
+</tr>
+
+<td>tables</td>
+<td>The names of the tables created when running the migrations.</td>
+<td>*See migrations</td>
+</tr>
+
+
+</table>
