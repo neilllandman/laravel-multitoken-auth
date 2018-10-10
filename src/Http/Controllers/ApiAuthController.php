@@ -51,6 +51,9 @@ class ApiAuthController extends Controller
 
         $clientIds = ApiClient::pluck('value')->toArray();
 
+        if (in_array($request->input('client_id'), $clientIds) === false) {
+            return response()->json(['message' => Lang::get('auth.failed')], 401);
+        }
         $this->validate($request, [
             'client_id' => [
                 'required',

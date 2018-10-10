@@ -1,7 +1,4 @@
 # Multiple Tokens
-(Full documentation to follow some day)
-
-
 <h2>Installation</h2>
 
 Add the following at the bottom of your composer.json to access the repo
@@ -93,7 +90,7 @@ Call authenticated routes using returned token in bearer token authorization hea
 
 Example: <code>/api/auth/user</code>
 <br>
-Headers: <code>Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV</code>
+Authorization Header: <code>Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV</code>
 
 Response: 
 
