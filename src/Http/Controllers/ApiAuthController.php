@@ -120,13 +120,13 @@ class ApiAuthController extends Controller
     private function authenticationSuccessful(User $user, ApiToken $apiToken)
     {
         $user->makeHidden(['deleted_at']);
-        $this->guard->user()->update(['last_login_at' => now()->toDateTimeString()]);
+
         $token = $apiToken->token;
         if ($apiToken->expires_at !== null && !$apiToken->should_forget) {
             $refresh_token = $apiToken->refresh_token;
             $expires_at = $apiToken->expires_at;
         }
-        $user->append(['role_name']);
+        
         return response()->json(compact('user', 'token', 'refresh_token', 'expires_at'));
     }
 

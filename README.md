@@ -39,6 +39,11 @@ Edit config/auth.php:
         ],
     ],
 
+
+Add trait to User model:
+
+<code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
+
 Login via route:
 
 <code>/api/auth/login</code>
