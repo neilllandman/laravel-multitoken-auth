@@ -37,7 +37,9 @@ You can manage clients by using the artisan commands
 
 
 Create API client ID: 
-<br><code>php artisan landman:tokens:make-client {Name}</code>
+<br><code>php artisan landman:tokens:make-client {name}</code>
+
+Note that the names must be unique.
 
 List Client IDs: 
 <br><code>php artisan landman:tokens:list-clients</code>
@@ -54,7 +56,7 @@ Delete a Client:
 <br><code>php artisan landman:tokens:delete-client {ID}</code>
 
 Refresh a Client (this will reset the 'Api Client ID' value): 
-<br><code>php artisan landman:tokens:refresh-client {ID}</code>
+<br><code>php artisan landman:tokens:refresh-client {name}</code>
 
 
 <h2>Routes</h2>
