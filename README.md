@@ -44,6 +44,8 @@ Add trait to User model:
 
 <code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
 
+#Usage
+
 Login via route:
 
 <code>/api/auth/login</code>

@@ -45,7 +45,7 @@ class ServiceProvider extends AuthServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
 
         $this->publishes([
-            __DIR__ . '/../../config' => config_path('multipletokens'),
+            __DIR__ . '/../../config' => config_path(''), 'landman-multiple-tokens'
         ]);
 
 
