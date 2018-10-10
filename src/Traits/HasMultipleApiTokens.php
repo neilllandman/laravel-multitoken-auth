@@ -26,4 +26,12 @@ trait HasMultipleApiTokens
     {
         return $this->apiTokens()->save(new ApiToken());
     }
+
+    /**
+     * @return bool
+     */
+    public function canAccessApi(): bool
+    {
+        return true;
+    }
 }
