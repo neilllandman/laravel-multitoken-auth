@@ -3,6 +3,7 @@
 namespace Landman\MultiTokenAuth\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Traits\HasUuidKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
@@ -23,6 +24,9 @@ class ApiToken extends Model
 
     /** @var array */
     protected $guarded = ['id'];
+
+    /** @var array */
+    protected $encryptable = [];
 
     /**  */
     const TOKEN_LENGTH = 60;

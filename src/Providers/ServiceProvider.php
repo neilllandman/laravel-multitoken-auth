@@ -2,11 +2,12 @@
 
 namespace Landman\MultiTokenAuth\Providers;
 
-use App\Services\Auth\TokensGuard;
-use App\Services\Auth\TokensUserProvider;
+
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Landman\MultiTokenAuth\Auth\TokensGuard;
+use Landman\MultiTokenAuth\Auth\TokensUserProvider;
 use Landman\MultiTokenAuth\Console\Commands\MakeApiClient;
 use Landman\MultiTokenAuth\Console\Commands\ListClients;
 

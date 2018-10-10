@@ -3,9 +3,9 @@
 namespace Landman\MultiTokenAuth\Http\Controllers;
 
 use App\ApiToken;
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use App\User;
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;

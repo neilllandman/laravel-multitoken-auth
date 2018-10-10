@@ -43,7 +43,12 @@ class MakeApiClient extends Command
      */
     public function handle()
     {
-        $clientId = ApiClient::make($this->argument('name'));
+        if(ApiClient::where('name', $this->argument('name'))->count()){
+            $this->error('Name already used.');
+            return;
+        }
+
+        ApiClient::make($this->argument('name'));
 //$this->info("{$clientId");
         $this->table(['Name', 'Value'], [ApiClient::latest()->first(['name', 'value'])->toArray()]);
     }
