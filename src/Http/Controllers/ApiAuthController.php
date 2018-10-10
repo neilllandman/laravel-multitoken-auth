@@ -53,6 +53,10 @@ class ApiAuthController extends Controller
                 )
             );
 
+            if (empty($clientIds)) {
+                return response()->json(['message' => Lang::get('auth.failed')], 401);
+            }
+
             $this->validate($request, [
                 'client_id' => [
                     'required',
