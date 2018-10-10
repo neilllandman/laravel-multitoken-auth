@@ -16,7 +16,7 @@ class DeleteClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:delete-client {name: The name of the client}';
+    protected $signature = 'landman:tokens:delete-client {name : The name of the client}';
 
     /**
      * The console command description.
@@ -54,7 +54,7 @@ class DeleteClient extends Command
                 $client->delete();
                 $this->info("Client {$client->name} deleted!");
             } else {
-                $this->error("No client with ID {$this->argument('name')} found!");
+                $this->error("No client with name {$this->argument('name')} found!");
             }
             return;
         }

@@ -16,7 +16,7 @@ class RefreshClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:refresh-client {name: The name of the client}';
+    protected $signature = 'landman:tokens:refresh-client {name : The name of the client}';
 
     /**
      * The console command description.
