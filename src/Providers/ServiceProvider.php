@@ -6,6 +6,7 @@ use App\Services\Auth\TokensGuard;
 use App\Services\Auth\TokensUserProvider;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 
 /**
@@ -37,7 +38,7 @@ class ServiceProvider extends AuthServiceProvider
             );
         });
 
-
+        dump(Config::get('multipletokens.test'));
         $this->loadMigrationsFrom(__DIR__ . '/../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
     }
