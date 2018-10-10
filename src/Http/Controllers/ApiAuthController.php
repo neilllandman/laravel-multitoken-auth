@@ -2,7 +2,7 @@
 
 namespace Landman\MultiTokenAuth\Http\Controllers;
 
-use App\ApiToken;
+use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Routing\Controller;
 use App\User;
 use Illuminate\Validation\Rule;
