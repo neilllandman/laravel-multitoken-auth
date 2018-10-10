@@ -3,6 +3,8 @@
 namespace Landman\MultiTokenAuth\Traits;
 
 
+use Landman\MultiTokenAuth\Models\ApiToken;
+
 /**
  * Trait HasMultipleApiTokens
  * @package Landman\MultiTokenAuth\Traits
