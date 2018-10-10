@@ -28,7 +28,7 @@ class ClientId extends Model
      * @param $name
      * @return mixed
      */
-    public function make($name){
+    public static function make($name){
         return self::create([
            'name' => $name,
            'value' => self::newId(),

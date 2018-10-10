@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateClientIdsTable extends Migration
+class CreateApiClientsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateClientIdsTable extends Migration
      */
     public function up()
     {
-        Schema::create('client_ids', function (Blueprint $table) {
+        Schema::create(\Illuminate\Support\Facades\Config::get('multipletokens.tables.api_clients'), function (Blueprint $table) {
             $table->uuid('id');
             $table->primary('id');
 
@@ -34,6 +34,6 @@ class CreateClientIdsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('api_tokens');
+        Schema::dropIfExists(\Illuminate\Support\Facades\Config::get('multipletokens.tables.api_clients'));
     }
 }

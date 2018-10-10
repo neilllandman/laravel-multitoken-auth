@@ -1,6 +1,12 @@
 <?php
 
 return [
+
+    'tables' => [
+      'api_clients' => 'api_clients',
+        'api_tokens' => 'api_tokens'
+    ],
+
     'username' => 'email',
 
     'login-validation' => [

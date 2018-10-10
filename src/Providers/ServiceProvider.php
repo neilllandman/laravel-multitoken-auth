@@ -8,6 +8,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Commands\MakeClientId;
+use Landman\MultiTokenAuth\Console\Commands\ListClients;
 
 
 /**
@@ -50,6 +51,7 @@ class ServiceProvider extends AuthServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MakeClientId::class,
+                ListClients::class,
             ]);
         }
     }

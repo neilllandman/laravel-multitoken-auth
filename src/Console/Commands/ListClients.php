@@ -1,6 +1,6 @@
 <?php
 
-namespace Landman\MultiTokenAuth\Commands;
+namespace Landman\MultiTokenAuth\Console\Commands;
 
 use Illuminate\Console\Command;
 use Landman\MultiTokenAuth\Models\ClientId;
@@ -9,21 +9,21 @@ use Landman\MultiTokenAuth\Models\ClientId;
  * Class MakeClientId
  * @package App\Console\Commands
  */
-class MakeClientId extends Command
+class ListClients extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:makeId name';
+    protected $signature = 'landman:tokens:list-clients';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new client id';
+    protected $description = 'List client id\'s.';
 
 
     /**
@@ -43,8 +43,6 @@ class MakeClientId extends Command
      */
     public function handle()
     {
-        $clientId = ClientId::make($this->argument('name'));
-
-        $this->info("Client Id: {$clientId->value}");
+        $this->table(['name', 'value'], ClientId::all(['name', 'value'])->toArray());
     }
 }
