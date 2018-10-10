@@ -1,0 +1,8 @@
+{
+    "name": "neilllandman/laravel-multitoken-auth",
+    "autoload": {
+        "psr-0" : {
+            "Landman\\MultiTokenAuth" : "src"
+        }
+    }
+}
