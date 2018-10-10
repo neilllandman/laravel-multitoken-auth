@@ -17,10 +17,9 @@ class CreateApiClientsTable extends Migration
             $table->uuid('id');
             $table->primary('id');
 
+            $table->string('name')->unique();
             $table->uuid('value');
-            $table->string('name');
 
-            $table->softDeletes();
             $table->timestamps();
 
             $table->index('value');
