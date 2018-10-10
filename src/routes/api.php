@@ -8,8 +8,8 @@ Route::group(['prefix' => 'api'], function () {
 //        });
 
         Route::group(['middleware' => 'auth:api'], function () {
-//            Route::post('logout', 'ApiAuthController@logout');
-//            Route::post('logout-all', 'ApiAuthController@logoutAll');
+            Route::post('logout', 'ApiAuthController@logout');
+            Route::post('logout-all', 'ApiAuthController@logoutAll');
             Route::get('/user', 'ApiAuthController@user');
         });
 

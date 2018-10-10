@@ -9,19 +9,29 @@ return [
     'username' => 'email',
 
     /*
-     * Validation rules to use upon login.
+     * Validation rules to use upon login. Note that the 'username' field
+     * will be replaced by the username supplied above.
      */
     'login-validation' => [
-        'client_id' => 'required|string',
-        'email' => 'required|email|string',
+        'username' => 'required|email|string',
         'password' => 'required|string',
     ],
 
     /*
-     * Table names for migrations.
+     * Table names used for migrations.
      */
     'tables' => [
         'api_clients' => 'api_clients',
         'api_tokens' => 'api_tokens'
     ],
+
+    /*
+     * Enabled routes. (Future)
+     */
+    'routes' => [
+        'login',
+        'logout',
+        'logout-all',
+        'register',
+    ]
 ];

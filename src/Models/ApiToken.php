@@ -211,14 +211,16 @@ class ApiToken extends Model
 
     /**
      * @return bool
+     * @throws \Exception
      */
     public function invalidate(): bool
     {
-        return $this->forceDelete();
+        return $this->delete();
     }
 
     /**
      * @return bool
+     * @throws \Exception
      */
     public function expire(): bool
     {

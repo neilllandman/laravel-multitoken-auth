@@ -109,6 +109,17 @@ class TokensGuard extends TokenGuard
     }
 
     /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function logoutAll(Request $request)
+    {
+        $this->guard->logout();
+        $count = $request->user()->apiTokens()->delete();
+        return response()->json(['count' => $count, 'success' => 1]);
+    }
+
+    /**
      * @return string
      */
     public function token()
@@ -132,7 +143,7 @@ class TokensGuard extends TokenGuard
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  \Illuminate\Contracts\Events\Dispatcher $events
      * @return void
      */
     public function setDispatcher(Dispatcher $events)
@@ -143,7 +154,7 @@ class TokensGuard extends TokenGuard
     /**
      * Fire the authenticated event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @return void
      */
     protected function fireAuthenticatedEvent($user)
@@ -156,8 +167,8 @@ class TokensGuard extends TokenGuard
     /**
      * Fire the login event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  bool  $remember
+     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param  bool $remember
      * @return void
      */
     protected function fireLoginEvent($user, $remember = false)

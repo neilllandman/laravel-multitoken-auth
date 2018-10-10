@@ -47,21 +47,14 @@ class ApiAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $this->validate($request, $this->config['login-validation']);
+        $rules = $this->getLoginValidationRules();
+        $this->validate($request, $rules);
 
         $clientIds = ApiClient::pluck('value')->toArray();
 
         if (in_array($request->input('client_id'), $clientIds) === false) {
             return response()->json(['message' => Lang::get('auth.failed')], 401);
         }
-        $this->validate($request, [
-            'client_id' => [
-                'required',
-                Rule::in($clientIds)
-            ]
-        ], [
-            'client_id' => 'Invalid client id.',
-        ]);
 
         $remember = $request->has('remember') && $request->input('remember');
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
@@ -197,6 +190,18 @@ class ApiAuthController extends Controller
 //        }
 //        return response()->json(compact('message'), 422);
 //    }
+
+    /**
+     * @return mixed
+     */
+    private function getLoginValidationRules()
+    {
+        $rules = $this->config['login-validation'];
+        $rules[$this->config['username']] = $rules['username'];
+        unset($rules['username']);
+
+        return $rules;
+    }
 }
 
 
