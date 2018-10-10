@@ -132,14 +132,18 @@ To further validate if a user can access the API, you can override the <code>can
 
 For example, if you would like to restrict access to your API to allow only users with certain roles:
     
-    public function canAccessApi(): bool
-    {
-        return $this->hasRole(['consumer', 'vendor']);
+    class User extends Model {
+        .
+        .
+        .
+        public function canAccessApi(): bool
+        {
+            return $this->hasRole(['consumer', 'vendor']);
+        }
     }
 
 
 <h2>Configuration</h2>
-
 
 Publish config/multipletokens.php.
 <br><code>php artisan vendor:publish</code>
