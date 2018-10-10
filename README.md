@@ -57,9 +57,23 @@ Refresh a Client (this will reset the 'Api Client ID' value):
 <br><code>php artisan landman:tokens:refresh-client {ID}</code>
 
 
+<h2>Routes</h2>
+Some routes are provided by default. Authenticated routes require an Authorization header with a valid token.
+<table>
+<thead>
+<tr><th>Method</th><th>URI</th><th>Authentication Required</th></tr>
+</thead>
+<tbody>
+<tr><td>POST</td><td>/api/auth/login</td><td>No</td>
+<tr><td>POST</td><td>/api/auth/logout</td><td>Yes</td></tr>
+<tr><td>POST</td><td>/api/auth/logout-all</td><td>Yes</td></tr>
+<tr><td>GET|HEAD</td><td>/api/auth/user</td><td>Yes</td></tr>
+</tbody>
+</table>
+
 <h2>Usage</h2>
 
-Login via route:
+Login
 <br><code>/api/auth/login</code>
 
 with params: 
