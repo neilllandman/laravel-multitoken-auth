@@ -23,7 +23,7 @@ class ListClients extends Command
      *
      * @var string
      */
-    protected $description = 'List client id\'s.';
+    protected $description = 'List API clients.';
 
 
     /**
@@ -43,6 +43,6 @@ class ListClients extends Command
      */
     public function handle()
     {
-        $this->table(['name', 'value'], ApiClient::all(['name', 'value'])->toArray());
+        $this->table(['Name', 'Value'], ApiClient::all(['name', 'value'])->toArray());
     }
 }

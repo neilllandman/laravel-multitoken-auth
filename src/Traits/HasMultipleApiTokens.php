@@ -18,4 +18,12 @@ trait HasMultipleApiTokens
     {
         return $this->hasMany(ApiToken::class);
     }
+
+    /**
+     * @return false|\Illuminate\Database\Eloquent\Model
+     */
+    public function issueToken()
+    {
+        return $this->apiTokens()->save(new ApiToken());
+    }
 }
