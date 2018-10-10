@@ -38,9 +38,12 @@ class ServiceProvider extends AuthServiceProvider
             );
         });
 
-        dump(Config::get('multipletokens.test'));
         $this->loadMigrationsFrom(__DIR__ . '/../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+
+        $this->publishes([
+            __DIR__ . '/../../config' => config_path('multipletokens'),
+        ]);
     }
 
     /**
@@ -48,9 +51,16 @@ class ServiceProvider extends AuthServiceProvider
      */
     public function register()
     {
-        Auth::resolveUsersUsing(function ($guard = null) {
-            return Auth::user() ? Auth::user() : Auth::guard('api')->user();
-        });
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/multipletokens.php', 'multipletokens'
+        );
+        dump(Config::get('multipletokens.test'));
+
+
+//        Auth::resolveUsersUsing(function ($guard = null) {
+//            return Auth::user() ? Auth::user() : Auth::guard('api')->user();
+//        });
         parent::register();
     }
 }
