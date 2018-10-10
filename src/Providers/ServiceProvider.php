@@ -55,7 +55,6 @@ class ServiceProvider extends AuthServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/../../config/multipletokens.php', 'multipletokens'
         );
-        dump(Config::get('multipletokens.test'));
 
 
 //        Auth::resolveUsersUsing(function ($guard = null) {

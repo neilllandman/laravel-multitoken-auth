@@ -5,8 +5,10 @@ namespace Landman\MultiTokenAuth\Http\Controllers;
 use App\ApiToken;
 use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 
@@ -21,6 +23,9 @@ class ApiAuthController extends Controller
      */
     protected $guard;
 
+    /** @var array */
+    protected $config;
+
     /**
      * ApiAuthController constructor.
      * @param Request $request
@@ -28,6 +33,7 @@ class ApiAuthController extends Controller
     function __construct(Request $request)
     {
         $this->guard = Auth::guard('api');
+        $this->config = Config::get('multipletokens');
     }
 
     /**
@@ -36,17 +42,30 @@ class ApiAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $this->validate($request, [
-            'client_id' => 'required|string',
-            'email' => 'required|email|string',
-            'password' => 'required|string',
-        ]);
+        $this->validate($request, $this->config['login-validation']);
 
-        if ($request->input('client_id') === config('auth.api_client_id')) {
-            $remember = $request->has('remember') && $request->input('remember');
-            if ($this->guard->attempt($request->only(['email', 'password']), $remember)) {
-                return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
-            }
+        if ($this->config['use-client-id'] === true) {
+
+            $clientIds = array_filter(
+                array_merge(
+                    [$this->config['client-id']],
+                    $this->config['client-ids']
+                )
+            );
+
+            $this->validate($request, [
+                'client_id' => [
+                    'required',
+                    Rule::in($clientIds)
+                ]
+            ], [
+                'client_id' => 'Invalid client id',
+            ]);
+        }
+
+        $remember = $request->has('remember') && $request->input('remember');
+        if ($this->guard->attempt($request->only(['email', 'password']), $remember)) {
+            return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
 
         return response()->json(['message' => Lang::get('auth.failed')], 401);
