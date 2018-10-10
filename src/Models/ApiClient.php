@@ -26,11 +26,21 @@ class ApiClient extends Model
      * @param $name
      * @return mixed
      */
-    public static function make($name){
+    public static function make($name)
+    {
         return self::create([
             'name' => $name,
             'value' => self::newId(),
         ]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function remake()
+    {
+        $this->update(['value' => self::newId()]);
+        return $this;
     }
 
     /**

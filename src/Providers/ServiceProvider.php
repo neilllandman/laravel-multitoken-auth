@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Auth\TokensUserProvider;
+use Landman\MultiTokenAuth\Console\Commands\DeleteClient;
 use Landman\MultiTokenAuth\Console\Commands\MakeApiClient;
 use Landman\MultiTokenAuth\Console\Commands\ListClients;
+use Landman\MultiTokenAuth\Console\Commands\RefreshClient;
 
 
 /**
@@ -51,6 +53,9 @@ class ServiceProvider extends AuthServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                MakeApiClient::class,
+                DeleteClient::class,
+                RefreshClient::class,
                 MakeApiClient::class,
                 ListClients::class,
             ]);

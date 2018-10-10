@@ -42,6 +42,9 @@ Create API client ids:
 List Client Ids: 
 <br><code>php artisan landman:tokens:list-clients</code>
 
+List Client Ids: 
+<br><code>php artisan landman:tokens:list-clients</code>
+
 <h2>Usage</h2>
 
 Login via route:

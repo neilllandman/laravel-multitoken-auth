@@ -43,6 +43,6 @@ class ListClients extends Command
      */
     public function handle()
     {
-        $this->table(['Name', 'Value'], ApiClient::all(['name', 'value'])->toArray());
+        $this->table(['Id', 'Name', 'Api Client ID'], ApiClient::all(['id', 'name', 'value'])->toArray());
     }
 }
