@@ -7,6 +7,7 @@ use App\Services\Auth\TokensUserProvider;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Landman\MultiTokenAuth\Commands\MakeClientId;
 
 
 /**
@@ -44,6 +45,13 @@ class ServiceProvider extends AuthServiceProvider
         $this->publishes([
             __DIR__ . '/../../config' => config_path('multipletokens'),
         ]);
+
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MakeClientId::class,
+            ]);
+        }
     }
 
     /**
