@@ -4,5 +4,8 @@
         "psr-0" : {
             "Landman\\MultiTokenAuth" : "src"
         }
+    },
+    "require": {
+        "illuminate/support": "^5.7"
     }
 }
