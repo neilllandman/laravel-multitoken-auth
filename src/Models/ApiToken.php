@@ -3,6 +3,7 @@
 namespace Landman\MultiTokenAuth\Models;
 
 use Carbon\Carbon;
+use Landman\MultiTokenAuth\Traits\HasUuidKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
