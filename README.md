@@ -2,7 +2,7 @@
 (Full documentation to follow some day)
 
 
-#Install
+<h2>Installation</h2>
 
 Add the following at the bottom of your composer.json to access the repo
 
@@ -37,7 +37,7 @@ Edit config/auth.php:
 Add trait to User model:
 <br><code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
 
-#Commands
+<h2>Commands</h2>
 
 Create API client ids: 
 <br><code>php artisan landman:tokens:make-client ClientName</code>
@@ -45,7 +45,7 @@ Create API client ids:
 List Client Ids: 
 <br><code>php artisan landman:tokens:list-clients</code>
 
-#Usage
+<h2>Usage</h2>
 
 Login via route:
 <br><code>/api/auth/login</code>
@@ -93,3 +93,17 @@ Response:
 
 
 
+
+<h2>Models</h2>
+The user's api tokens can be retrieved via the <code>$user->apiTokens()</code> relationship.
+
+To manually issue an ApiToken to a user, the <code>$user->issueToken()</code> method can be used. This method returns an instance of \Landman\MultiTokenAuth\Models\ApiToken
+
+To further validate if a user can access the API, you can override the <code>canAccessApi()</code> method available from the <code>HasMultipleApiTokens</code> trait.
+
+For example, if you would like to restrict access to your API to allow only users with certain roles:
+    
+    public function canAccessApi(): bool
+    {
+        return $this->hasRole(['consumer', 'vendor']);
+    }
