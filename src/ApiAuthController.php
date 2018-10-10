@@ -58,17 +58,8 @@ class ApiAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::guard('api')->logout();
+        $this->guard->logout();
         return response()->json(['success' => 1]);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function ping(Request $request)
-    {
-        return response()->json(['message' => 'Pong', 'body' => request()->input(), 'headers' => request()->header()]);
     }
 
     /**
@@ -98,58 +89,9 @@ class ApiAuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refreshToken(Request $request)
-    {
-        $this->validate($request, [
-            'grant_type' => 'required',
-            'refresh_token' => 'required',
-        ]);
-        if ($request->input('grant_type') === 'refresh_token') {
-            $user = User::find($request->input('user_id'));
-            if ($user) {
-                $token = null;
-                $user->apiTokens()->withTrashed()->latest()->each(function ($t) use (&$token, $request) {
-                    if ($t->equalsEncryptedAttribute('refresh_token', $request->input('refresh_token'))) {
-                        $token = $t;
-                        return false;
-                    }
-                });
-                if ($token) {
-                    $token->refresh();
-                    return $this->authenticationSuccessful($user, $token);
-                } else {
-                    $message = "Invalid refresh token.";
-                }
-            } else {
-                $message = Lang::get('auth.failed');
-            }
-        } else {
-            $message = Lang::get('auth.unsupported_grant_type') . " " . $request->input('grant_type') . ".";
-        }
-        return response()->json(compact('message'), 422);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function user(Request $request)
     {
-        $user = $request->user();
-        $user = $user;
-        $user->setHidden([
-            'password', 'admin_login_allowed_expiry', 'remember_token',
-            'deleted_at', 'created_at', 'updated_at'
-        ]);
-        if ($request->has('with_permissions')) {
-            $user->setPrettyPermissions();
-            $user->append('abilities');
-        }
-        if ($request->has('with_gym')) {
-            $user->load(['gym']);
-        }
-        $user->append(['role_name']);
-        return response()->json($user);
+        return response()->json($request->user());
     }
 
     /**
@@ -201,6 +143,41 @@ class ApiAuthController extends Controller
             ], 500);
         }
     }
+
+//    /**
+//     * @param Request $request
+//     * @return \Illuminate\Http\JsonResponse
+//     */
+//    public function refreshToken(Request $request)
+//    {
+//        $this->validate($request, [
+//            'grant_type' => 'required',
+//            'refresh_token' => 'required',
+//        ]);
+//        if ($request->input('grant_type') === 'refresh_token') {
+//            $user = User::find($request->input('user_id'));
+//            if ($user) {
+//                $token = null;
+//                $user->apiTokens()->withTrashed()->latest()->each(function ($t) use (&$token, $request) {
+//                    if ($t->equalsEncryptedAttribute('refresh_token', $request->input('refresh_token'))) {
+//                        $token = $t;
+//                        return false;
+//                    }
+//                });
+//                if ($token) {
+//                    $token->refresh();
+//                    return $this->authenticationSuccessful($user, $token);
+//                } else {
+//                    $message = "Invalid refresh token.";
+//                }
+//            } else {
+//                $message = Lang::get('auth.failed');
+//            }
+//        } else {
+//            $message = Lang::get('auth.unsupported_grant_type') . " " . $request->input('grant_type') . ".";
+//        }
+//        return response()->json(compact('message'), 422);
+//    }
 }
 
 
