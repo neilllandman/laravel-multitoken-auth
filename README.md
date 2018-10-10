@@ -43,17 +43,18 @@ Note that the names must be unique.
 
 List Client IDs: 
 <br><code>php artisan landman:tokens:list-clients</code>
-
-    +--------------------------------------+---------+--------------------------------------+
-    | Id                                   | Name    | Api Client ID                        |
-    +--------------------------------------+---------+--------------------------------------+
-    | 577e1bbb-e002-c000-a558-dae66220a70b | Android | 577e1bbb-dfd7-0000-8b28-e54c536a9738 |
-    | 577e1bbf-ef3e-8000-a4fb-9852f7cb6cc3 | iOS     | 577e1bbf-ef19-0000-bb59-97193ffe088c |
-    +--------------------------------------+---------+--------------------------------------+
+<br>Sample output: 
+    
+    +---------+--------------------------------------+
+    | Name    | Api Client ID                        |
+    +---------+--------------------------------------+
+    | Android | 577e1bbb-dfd7-0000-8b28-e54c536a9738 |
+    | iOS     | 577e1bbf-ef19-0000-bb59-97193ffe088c |
+    +---------+--------------------------------------+
 
 
 Delete a Client: 
-<br><code>php artisan landman:tokens:delete-client {ID}</code>
+<br><code>php artisan landman:tokens:delete-client {name}</code>
 
 Refresh a Client (this will reset the 'Api Client ID' value): 
 <br><code>php artisan landman:tokens:refresh-client {name}</code>
