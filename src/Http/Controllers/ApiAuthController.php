@@ -61,7 +61,7 @@ class ApiAuthController extends Controller
         ]);
 
         $remember = $request->has('remember') && $request->input('remember');
-        if ($this->guard->attempt($request->only(['email', 'password']), $remember)) {
+        if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
 
