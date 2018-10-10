@@ -10,10 +10,10 @@ namespace Landman\MultiTokenAuth\Traits;
 trait HasMultipleApiTokens
 {
     /**
-     * @return bool
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function canAccessApi()
+    public function apiTokens()
     {
-        return true;
+        return $this->hasMany(ApiToken::class);
     }
 }
