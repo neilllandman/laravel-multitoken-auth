@@ -19,6 +19,10 @@ use Landman\MultiTokenAuth\Models\ApiClient;
  */
 class ApiAuthController extends Controller
 {
+
+    use \Illuminate\Foundation\Validation\ValidatesRequests;
+    use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
     /**
      * @var mixed
      */
@@ -45,19 +49,16 @@ class ApiAuthController extends Controller
     {
         $this->validate($request, $this->config['login-validation']);
 
-        if ($this->config['use-client-id'] === true) {
+        $clientIds = ApiClient::pluck('value')->toArray();
 
-            $clientIds = ApiClient::pluck('value')->toArray();
-
-            $this->validate($request, [
-                'client_id' => [
-                    'required',
-                    Rule::in($clientIds)
-                ]
-            ], [
-                'client_id' => 'Invalid client id.',
-            ]);
-        }
+        $this->validate($request, [
+            'client_id' => [
+                'required',
+                Rule::in($clientIds)
+            ]
+        ], [
+            'client_id' => 'Invalid client id.',
+        ]);
 
         $remember = $request->has('remember') && $request->input('remember');
         if ($this->guard->attempt($request->only(['email', 'password']), $remember)) {
