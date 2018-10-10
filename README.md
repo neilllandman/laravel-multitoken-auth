@@ -154,6 +154,4 @@ Publish config/multipletokens.php.
 <td>The names of the tables created when running the migrations.</td>
 <td>*See migrations</td>
 </tr>
-
-
 </table>

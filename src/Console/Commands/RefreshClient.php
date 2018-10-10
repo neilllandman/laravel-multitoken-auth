@@ -16,7 +16,7 @@ class RefreshClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:refresh-client {clientId}';
+    protected $signature = 'landman:tokens:refresh-client {name: The name of the client}';
 
     /**
      * The console command description.
@@ -47,13 +47,13 @@ class RefreshClient extends Command
             'This will permanently change this ID and all clients using it will no longer be able access your API. Continue?'
         );
         if ($confirm) {
-            $client = ApiClient::find($this->argument('clientId'));
+            $client = ApiClient::where('name', $this->argument('name'))->first();
             if ($client) {
                 $client->remake();
                 $this->line("Client updated!");
-                $this->table(['ID', 'Name', 'Api Client ID'], [ApiClient::latest()->first(['id', 'name', 'value'])->toArray()]);
+                $this->table(['Name', 'Api Client ID'], [ApiClient::latest()->first(['name', 'value'])->toArray()]);
             } else {
-                $this->error("No client with ID {$this->argument('clientId')} found!");
+                $this->error("No client with name {$this->argument('name')} found!");
             }
             return;
         }

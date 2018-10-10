@@ -16,7 +16,7 @@ class DeleteClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:delete-client {clientId}';
+    protected $signature = 'landman:tokens:delete-client {name: The name of the client}';
 
     /**
      * The console command description.
@@ -48,13 +48,13 @@ class DeleteClient extends Command
             'This will permanently delete this ID and all clients using it will no longer be able access your API. Continue?'
         );
         if ($confirm) {
-            $client = ApiClient::find($this->argument('clientId'));
+            $client = ApiClient::where('name', $this->argument('name'))->first();
 
             if ($client) {
                 $client->delete();
                 $this->info("Client {$client->name} deleted!");
             } else {
-                $this->error("No client with ID {$this->argument('clientId')} found!");
+                $this->error("No client with ID {$this->argument('name')} found!");
             }
             return;
         }

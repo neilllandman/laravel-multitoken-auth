@@ -16,7 +16,7 @@ class MakeApiClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:make-client {name}';
+    protected $signature = 'landman:tokens:make-client {name: The name of the client}';
 
     /**
      * The console command description.
@@ -50,6 +50,6 @@ class MakeApiClient extends Command
 
         ApiClient::make($this->argument('name'));
 //$this->info("{$clientId");
-        $this->table(['ID', 'Name', 'Api Client ID'], [ApiClient::latest()->first(['id', 'name', 'value'])->toArray()]);
+        $this->table(['Name', 'Api Client ID'], [ApiClient::latest()->first(['name', 'value'])->toArray()]);
     }
 }
