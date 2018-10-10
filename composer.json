@@ -7,5 +7,12 @@
     },
     "require": {
         "illuminate/support": "^5.7"
-    }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Landman\\MultiTokenAuth\\AuthServiceProvider"
+            ]
+        }
+    },
 }
