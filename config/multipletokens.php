@@ -3,7 +3,7 @@
 return [
 
     /*
-     * Eloquent model class.
+     * The Eloquent model class to use.
      */
     'model' => 'App\\User',
 
@@ -14,7 +14,7 @@ return [
     'username' => 'email',
 
     /*
-     * Table names used for migrations.
+     * The names of the tables created when running the migrations.
      */
     'tables' => [
         'clients' => 'api_clients',
@@ -40,7 +40,7 @@ return [
 
         /*
          * Validation rules to use upon registration. If the 'fields' array above
-         * is not given, the keys for this array will be used
+         * is not given, the keys for this array will be used.
          */
         'validation' => [
             'name' => 'required|string|min:2',
@@ -50,12 +50,17 @@ return [
     ],
 
     /*
-     * Enabled routes. (Future)
+     * Route mappings. If you would like to change the default route paths, you can do that here.
      */
-//    'routes' => [
-//        'login',
-//        'register',
-//        'logout',
-//        'logout-all',
-//    ]
+    'routes' => [
+        'prefix' => 'api',
+        'mappings' => [
+            'login' => '/auth/login',
+            'register' => '/auth/register',
+            'user' => '/auth/user',
+            'logout' => '/auth/logout',
+            'logout-all' => '/auth/logout-all',
+            'token-refresh' => 'token/refresh',
+        ],
+    ]
 ];

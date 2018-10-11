@@ -31,6 +31,12 @@ Edit config/auth.php:
 Add trait to User model:
 <br><code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
 
+    class User extends Model {
+        use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
+        .
+        .
+    }
+
 <h2>Managing Client IDs</h2>
 
 You can manage clients by using the artisan commands
@@ -155,12 +161,12 @@ Publish config/multipletokens.php.
 <tbody>
 <tr>
 <td>model</td>
-<td>The class of the eloquent user model to use.</td>
+<td>The Eloquent model class to use.</td>
 <td>App\User</td>
 </tr>
 <tr>
 <td>username</td>
-<td>The username column of the model.</td>
+<td>Eloquent model username column. This column will be used for authentication on login.</td>
 <td>email</td>
 </tr>
 <tr>
@@ -168,22 +174,26 @@ Publish config/multipletokens.php.
 <td>The names of the tables created when running the migrations.</td>
 <td>
 
+    [
         'clients' => 'api_clients',
         'tokens' => 'api_tokens'
+    ]
 </td>
 </tr>
 <tr>
 <td>login.validation</td>
-<td>The validation array to use when logging in.</td>
+<td>Validation rules to use upon login. Note that client_id is always validated.</td>
 <td>
 
-    'email' => 'required|email|string',
-    'password' => 'required|string',
+    [
+        'email' => 'required|email|string',
+        'password' => 'required|string',
+    ]
 </td>
 </tr>
 <tr>
 <td>register.validation</td>
-<td>The validation array to use when registering.</td>
+<td>The fields that will be passed to the create method of the given Eloquent model. Note that if the password field is present it will be encrypted using bcrypt().</td>
 <td>
 
     ['name','email','password'],
@@ -192,12 +202,34 @@ Publish config/multipletokens.php.
 
 <tr>
 <td>register.validation</td>
-<td>The validation array to use when registering.</td>
+<td>Validation rules to use upon registration. If the 'fields' array above is not given, the keys for this array will be used.</td>
 <td>
-
-    'name' => 'required|string|min:2',
-    'email' => 'required|email|string|unique:users',
-    'password' => 'required|string|min:12|confirmed',
+    
+    [
+        'name' => 'required|string|min:2',
+        'email' => 'required|email|string|unique:users',
+        'password' => 'required|string|min:12|confirmed',
+    ]
 </td>
 </tr>
+
+<tr>
+<td>routes</td>
+<td>Route mappings. If you would like to change the default route paths, you can do that here.</td>
+<td>
+    
+    [
+        'prefix' => 'api',
+        'mappings' => [
+            'login' => '/auth/login',
+            'register' => '/auth/register',
+            'user' => '/auth/user',
+            'logout' => '/auth/logout',
+            'logout-all' => '/auth/logout-all',
+            'token-refresh' => 'token/refresh',
+        ],
+    ]
+</td>
+</tr>
+
 </table>
