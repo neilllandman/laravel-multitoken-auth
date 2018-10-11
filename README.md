@@ -164,22 +164,40 @@ Publish config/multipletokens.php.
 <td>email</td>
 </tr>
 <tr>
-<td>login.validation</td>
-<td>The validation array to use when logging in.</td>
-<td>
-
-    'username' => 'required|email|string',
-    'password' => 'required|string',
-
-</td>
-</tr>
-
 <td>tables</td>
 <td>The names of the tables created when running the migrations.</td>
 <td>
 
         'clients' => 'api_clients',
         'tokens' => 'api_tokens'
+</td>
+</tr>
+<tr>
+<td>login.validation</td>
+<td>The validation array to use when logging in.</td>
+<td>
+
+    'email' => 'required|email|string',
+    'password' => 'required|string',
+</td>
+</tr>
+<tr>
+<td>register.validation</td>
+<td>The validation array to use when registering.</td>
+<td>
+
+    ['name','email','password'],
+</td>
+</tr>
+
+<tr>
+<td>register.validation</td>
+<td>The validation array to use when registering.</td>
+<td>
+
+    'name' => 'required|string|min:2',
+    'email' => 'required|email|string|unique:users',
+    'password' => 'required|string|min:12|confirmed',
 </td>
 </tr>
 </table>
