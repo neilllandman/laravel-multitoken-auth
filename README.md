@@ -152,6 +152,8 @@ For example, if you would like to restrict access to your API to allow only user
 
 <h2>Configuration</h2>
 
+Please see comments in https://gitlab.com/neilllandman/laravel-multitoken-auth/blob/master/config/multipletokens.php for more information. 
+
 Publish config/multipletokens.php.
 <br><code>php artisan vendor:publish</code>
 
@@ -219,6 +221,7 @@ Publish config/multipletokens.php.
 <td>
     
     [
+        'middleware' => ['api'],
         'prefix' => 'api',
         'mappings' => [
             'login' => '/auth/login',

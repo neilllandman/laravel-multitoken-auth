@@ -22,16 +22,21 @@ return [
     ],
 
     /*
-     * Validation rules to use upon login. Note that client_id is always validated.
+     * Login configurations.
      */
     'login' => [
+        /*
+         * Validation rules to use upon login. Note that client_id is always validated.
+         */
         'validation' => [
             'email' => 'required|email|string',
             'password' => 'required|string',
         ]
     ],
 
-
+    /*
+     * Register configuration.
+     */
     'register' => [
         /* The fields that will be passed to the create method of the given Eloquent model. Note
          * that if the password field is present it will be encrypted using bcrypt().
@@ -53,7 +58,14 @@ return [
      * Route mappings. If you would like to change the default route paths, you can do that here.
      */
     'routes' => [
+
+        /* Middleware to apply to all routes. By default, we're using Laravel's api group. */
+        'middleware' => ['api'],
+
+        /* Prefix for all routes */
         'prefix' => 'api',
+
+        /* Mappings */
         'mappings' => [
             'login' => '/auth/login',
             'register' => '/auth/register',

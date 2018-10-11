@@ -262,5 +262,3 @@ class ApiAuthController extends Controller
         return $this->requestHasValidClientId($request) === false;
     }
 }
-
-

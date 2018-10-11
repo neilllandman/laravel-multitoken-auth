@@ -3,9 +3,10 @@
 namespace Landman\MultiTokenAuth\Providers;
 
 
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
+use Illuminate\Support\ServiceProvider as MainServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Auth\TokensUserProvider;
 use Landman\MultiTokenAuth\Console\Commands\DeleteClient;
@@ -18,7 +19,7 @@ use Landman\MultiTokenAuth\Console\Commands\RefreshClient;
  * Class AuthServiceProvider
  * @package App\Providers
  */
-class ServiceProvider extends AuthServiceProvider
+class ServiceProvider extends SupportServiceProvider
 {
     /**
      * Register any authentication / authorization services.
@@ -27,12 +28,12 @@ class ServiceProvider extends AuthServiceProvider
      */
     public function boot()
     {
-        // add custom api guard provider
+        // add api user provider.
         Auth::provider('token-users', function ($app, array $config) {
             return new TokensUserProvider($app->make(Config::get('multipletokens.model')));
         });
 
-        // add custom api guard
+        // add api guard.
         Auth::extend('multi-tokens', function ($app, $name, array $config) {
             return new TokensGuard(
                 new TokensUserProvider($app->make(Config::get('multipletokens.model'))),
@@ -43,14 +44,22 @@ class ServiceProvider extends AuthServiceProvider
             );
         });
 
-        $this->loadMigrationsFrom(__DIR__ . '/../migrations');
-        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        // Load migrations.
+        $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
 
+        // Register routes.
+        $routeConfig = Config::get('multipletokens.routes');
+        Route::prefix($routeConfig['prefix'])
+            ->middleware($routeConfig['middleware'])
+            ->namespace("Landman\\MultiTokenAuth\\Http\\Controllers")
+            ->group(__DIR__ . '/../../routes/api.php');
+
+        // Publish files.
         $this->publishes([
             __DIR__ . '/../../config/multipletokens.php' => config_path('multipletokens.php'),
         ]);
 
-
+        // Register commands.
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MakeApiClient::class,
@@ -71,7 +80,6 @@ class ServiceProvider extends AuthServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/../../config/multipletokens.php', 'multipletokens'
         );
-
 
 //        Auth::resolveUsersUsing(function ($guard = null) {
 //            return Auth::user() ? Auth::user() : Auth::guard('api')->user();
