@@ -48,6 +48,11 @@ return [
 //        'fields' => ['name', 'email', 'password'],
 
         /*
+         * You can also specify the fields passed to be the fillable array declared on your User model.
+         */
+//    'usefillable' => true,
+
+        /*
          * Validation rules to use upon registration. If the 'fields' array above
          * is not given, the keys for this array will be used.
          */
@@ -78,5 +83,10 @@ return [
             'logout-all' => '/auth/logout-all',
             'token-refresh' => 'token/refresh',
         ],
-    ]
+    ],
+
+    /*
+     * Events
+     */
+    'model-is-listening' => false,
 ];

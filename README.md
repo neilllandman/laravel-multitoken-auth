@@ -234,5 +234,31 @@ Publish config/multipletokens.php.
     ]
 </td>
 </tr>
-
+<tr>
+<td>model-is-listening</td>
+<td>Specifies whether the model event functions should be fired. (Refer to Events)</td>
+<td>false</td>
+</tr>
 </table>
+
+<h2>Events</h2>
+To hook into the login and register functions, you should publish the configuration files and set the 'model-is-listening' option to true and add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
+
+    class User extends Model {
+        use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
+        use \Landman\MultiTokenAuth\Traits\ListensOnApiEvents;
+        .
+        .
+    }
+
+This trait exposes the following methods all of which receives the current request as the only parameter.
+<table>
+<tr><td><code>afterApiRegistered</code></td><td>Runs after successful registeration.</td><tr>
+<tr><td><code>afterApiLogin</code></td><td>Runs after successful login.</td><tr>
+<tr><td><code>afterApiLogout</code></td><td>Runs after successful logout.</td><tr>
+</table>
+
+Example: Assigning a role to a newly created user after registration
+
+
+ 

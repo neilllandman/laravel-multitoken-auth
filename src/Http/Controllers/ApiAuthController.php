@@ -30,6 +30,8 @@ class ApiAuthController extends Controller
     /** @var array */
     protected $config;
 
+    protected $shouldFireEvents;
+
     /**
      * ApiAuthController constructor.
      * @param Request $request
@@ -38,6 +40,7 @@ class ApiAuthController extends Controller
     {
         $this->guard = Auth::guard('api');
         $this->config = Config::get('multipletokens');
+        $this->shouldFireEvents = $this->config(['model-is-listening']);
         $this->user = app()->make($this->config['model']);
     }
 
@@ -55,6 +58,7 @@ class ApiAuthController extends Controller
 
         $remember = $request->has('remember') && $request->input('remember');
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
+            $this->handleEvent($request, $this->guard->user, 'afterApiLogin');
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
 
@@ -67,7 +71,9 @@ class ApiAuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $user = $this->guard->user();
         $this->guard->logout();
+        $this->handleEvent($request, $user, 'afterApiLogout');
         return response()->json(['success' => 1]);
     }
 
@@ -102,9 +108,16 @@ class ApiAuthController extends Controller
         }
         try {
             DB::beginTransaction();
-            $user = $this->user->create($userData);
+
+            $user = $this->user->fill($userData);
+            $user = $this->handleEvent($request, $user, 'beforeApiRegistered');
+            $user->save();
+            $this->handleEvent($request, $user, 'afterApiRegistered');
+
             DB::commit();
+
             if ($this->guard->attempt($request->only([$this->config['username'], 'password']))) {
+                $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
                 return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
             }
         } catch (\Exception $e) {
@@ -132,7 +145,7 @@ class ApiAuthController extends Controller
      */
     private function authenticationSuccessful($user, ApiToken $apiToken)
     {
-        $user->makeHidden(['deleted_at']);
+        $user = $user->toApiFormat();
 
         $token = $apiToken->token;
         if ($apiToken->expires_at !== null && !$apiToken->should_forget) {
@@ -260,5 +273,20 @@ class ApiAuthController extends Controller
     {
         $request = $request ?? request();
         return $this->requestHasValidClientId($request) === false;
+    }
+
+    /**
+     * @param $request
+     * @param $user
+     * @param $eventName
+     * @return bool
+     */
+    private function handleEvent(Request $request, $user, $eventName)
+    {
+        if ($this->shouldFireEvents) {
+            $user->{eventName}($request);
+            return true;
+        }
+        return false;
     }
 }

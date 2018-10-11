@@ -34,4 +34,20 @@ trait HasMultipleApiTokens
     {
         return true;
     }
+
+    /**
+     * @param $request
+     */
+    public function onApiRegistered($request)
+    {
+
+    }
+
+    /**
+     * @return $this
+     */
+    public function toApiFormat()
+    {
+        return $this;
+    }
 }
