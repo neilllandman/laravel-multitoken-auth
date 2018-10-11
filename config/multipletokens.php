@@ -79,6 +79,7 @@ return [
             'login' => '/auth/login',
             'register' => '/auth/register',
             'user' => '/auth/user',
+            'devices' => '/user/api-devices',
             'logout' => '/auth/logout',
             'logout-all' => '/auth/logout-all',
             'token-refresh' => 'token/refresh',

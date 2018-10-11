@@ -11,6 +11,8 @@ Route::group([], function () use ($mappings) {
 
         Route::group(['middleware' => 'auth:api'], function () use ($mappings) {
 
+            Route::get($mappings['devices'], 'ApiAuthController@devices');
+
             Route::post($mappings['logout'], 'ApiAuthController@logout');
             Route::post($mappings['logout-all'], 'ApiAuthController@logoutAll');
             Route::post($mappings['token-refresh'], 'ApiAuthController@refreshToken');

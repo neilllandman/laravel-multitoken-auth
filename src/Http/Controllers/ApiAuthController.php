@@ -341,4 +341,17 @@ class ApiAuthController extends Controller
             ])
             : response()->json(['message' => ''], 500);
     }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function devices(Request $request)
+    {
+
+        return response()->json(
+            $request->user()->apiTokens()->pluck(['id', 'device'])
+        );
+
+    }
 }
