@@ -60,8 +60,10 @@ class TokensGuard extends TokenGuard
         $device = $request->input('device') ?? 'Unknown';
 
         $token = new ApiToken(compact('remember', 'user_agent', 'device'));
+        $token->setExpiresAt();
         $this->fireLoginEvent($user, $remember);
         $user->apiTokens()->save($token);
+        dd($token);
         $this->setUser($user);
         $this->setToken($token);
     }

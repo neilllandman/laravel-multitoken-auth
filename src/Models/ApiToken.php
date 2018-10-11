@@ -37,6 +37,8 @@ class ApiToken extends Model
         'remember' => 'boolean',
     ];
 
+    protected $dates = ['created_at', 'updated_at', 'expires_at'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -70,6 +72,7 @@ class ApiToken extends Model
         parent::boot();
         static::creating(function (ApiToken $token) {
             $token->setFreshFields();
+            return true;
         });
     }
 
@@ -91,7 +94,7 @@ class ApiToken extends Model
     {
         $this->token = $this->generateToken();
         $this->refresh_token = $this->generateToken();
-        $this->expires_at = $this->should_forget ? $this->generateExpiresAtDate() : null;
+        $this->expires_at = $this->generateExpiresAtDate();
         return $this;
     }
 
@@ -116,7 +119,7 @@ class ApiToken extends Model
      */
     public function generateExpiresAtDate()
     {
-        return now()->addMinutes(config('session.lifetime'));
+        return now()->addMinutes(Config::get('multipletokens.token_lifetime', 14400));
     }
 
     /**
@@ -219,6 +222,24 @@ class ApiToken extends Model
     }
 
     /**
+     * @return ApiToken
+     */
+    public function updateExpiresAt(): ApiToken
+    {
+        $this->update(['expires_at' => $this->generateExpiresAtDate()]);
+        return $this;
+    }
+
+    /**
+     * @return ApiToken
+     */
+    public function setExpiresAt(): ApiToken
+    {
+        $this->expires_at = $this->generateExpiresAtDate();
+        return $this;
+    }
+
+    /**
      * @return bool
      * @throws \Exception
      */
@@ -234,6 +255,6 @@ class ApiToken extends Model
     public function getTable()
     {
         parent::getTable();
-        return Config::get('multipletokens.tables.tokens');
+        return Config::get('multipletokens.table_tokens');
     }
 }

@@ -49,6 +49,6 @@ class ApiClient extends Model
     public function getTable()
     {
         parent::getTable();
-        return Config::get('multipletokens.tables.clients');
+        return Config::get('multipletokens.table_clients');
     }
 }

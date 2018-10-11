@@ -13,7 +13,7 @@ class CreateApiClientsTable extends Migration
      */
     public function up()
     {
-        Schema::create(\Illuminate\Support\Facades\Config::get('multipletokens.tables.clients'), function (Blueprint $table) {
+        Schema::create(\Illuminate\Support\Facades\Config::get('multipletokens.table_clients'), function (Blueprint $table) {
             $table->uuid('id');
             $table->primary('id');
 
@@ -33,6 +33,6 @@ class CreateApiClientsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(\Illuminate\Support\Facades\Config::get('multipletokens.tables.clients'));
+        Schema::dropIfExists(\Illuminate\Support\Facades\Config::get('multipletokens.table_clients'));
     }
 }

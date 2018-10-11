@@ -41,7 +41,7 @@ class ApiAuthController extends Controller
     {
         $this->guard = Auth::guard('api');
         $this->config = Config::get('multipletokens');
-        $this->shouldFireEvents = $this->config['model-is-listening'];
+        $this->shouldFireEvents = $this->config['model_is_listening'];
         $this->user = app()->make($this->config['model']);
     }
 
@@ -231,7 +231,7 @@ class ApiAuthController extends Controller
      */
     private function getLoginValidationRules()
     {
-        return $this->config['login']['validation'];
+        return $this->config['login_validation'];
     }
 
     /**
@@ -239,7 +239,7 @@ class ApiAuthController extends Controller
      */
     private function getRegisterValidationRules()
     {
-        return $this->config['register']['validation'];
+        return $this->config['register_validation'];
     }
 
     /**
@@ -247,12 +247,11 @@ class ApiAuthController extends Controller
      */
     private function getRegistrationFields()
     {
-        $registerConfig = $this->config['register'];
-        if ($registerConfig['usefillable']) {
+        if ($this->config['register_usefillable']) {
             return $this->user->getFillable();
         }
-        $fields = $registerConfig['fields'] ?? [];
-        return count($fields) ? $fields : array_keys($registerConfig['validation']);
+        $fields = $this->config['register_fields'] ?? [];
+        return count($fields) ? $fields : array_keys($this->config['register_validation']);
     }
 
     /**
@@ -348,9 +347,12 @@ class ApiAuthController extends Controller
      */
     public function devices(Request $request)
     {
-
         return response()->json(
-            $request->user()->apiTokens()->pluck(['id', 'device'])
+            $request->user()->apiTokens()->get([
+                'id',
+                'device',
+                'updated_at',
+            ])
         );
 
     }

@@ -1,6 +1,5 @@
 <?php
-$config = \Illuminate\Support\Facades\Config::get('multipletokens.routes');
-$mappings = $config['mappings'];
+$mappings = \Illuminate\Support\Facades\Config::get('multipletokens.route_mappings');
 
 Route::group([], function () use ($mappings) {
 
@@ -21,7 +20,7 @@ Route::group([], function () use ($mappings) {
             Route::post($mappings['password-update'], 'ApiAuthController@updatePassword');
         });
 
-        Route::post($mappings['password-email'], 'ForgotPasswordController@getResetToken');
-        Route::post($mappings['password-reset'], 'ResetPasswordController@reset');
+        Route::post($mappings['password-email'], 'ApiAuthController@sendResetLinkEmail');
+        Route::post($mappings['password-reset'], 'ApiAuthController@reset');
     });
 });

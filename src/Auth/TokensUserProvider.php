@@ -30,7 +30,6 @@ class TokensUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Contracts\Hashing\Hasher $hasher
      * @param  string $model
      * @return void
      */
@@ -96,7 +95,7 @@ class TokensUserProvider implements UserProvider
                 (count($credentials) === 1 &&
                     array_key_exists('password', $credentials))
             ) {
-                return;
+                return null;
             }
 
             // First we will add each credential element to the query as a where clause.

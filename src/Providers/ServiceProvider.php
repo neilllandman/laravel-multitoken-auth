@@ -48,9 +48,9 @@ class ServiceProvider extends SupportServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
 
         // Register routes.
-        $routeConfig = Config::get('multipletokens.routes');
-        Route::prefix($routeConfig['prefix'])
-            ->middleware($routeConfig['middleware'])
+        $config = Config::get('multipletokens');
+        Route::prefix($config['route_prefix'])
+            ->middleware($config['route_middleware'])
             ->namespace("Landman\\MultiTokenAuth\\Http\\Controllers")
             ->group(__DIR__ . '/../../routes/api.php');
 
