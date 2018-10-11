@@ -68,6 +68,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 </thead>
 <tbody>
 <tr><td>POST</td><td>/api/auth/login</td><td>No</td>
+<tr><td>POST</td><td>/api/auth/register</td><td>No</td>
 <tr><td>POST</td><td>/api/auth/logout</td><td>Yes</td></tr>
 <tr><td>POST</td><td>/api/auth/logout-all</td><td>Yes</td></tr>
 <tr><td>GET|HEAD</td><td>/api/auth/user</td><td>Yes</td></tr>

@@ -85,6 +85,7 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function register(Request $request)
     {
@@ -99,12 +100,18 @@ class ApiAuthController extends Controller
         if ($this->passwordRequiredForRegistration()) {
             $userData['password'] = bcrypt($request->input('password'));
         }
-
-        $user = $this->user->create($userData);
-
-        if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
-            return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
+        try {
+            DB::beginTransaction();
+            $user = $this->user->create($userData);
+            DB::commit();
+            if ($this->guard->attempt($request->only([$this->config['username'], 'password']))) {
+                return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
         }
+
     }
 
     /**
@@ -205,7 +212,7 @@ class ApiAuthController extends Controller
      */
     private function getLoginValidationRules()
     {
-        $rules = $this->config['login.validation'];
+        $rules = $this->config['login']['validation'];
         if ($this->config['username'] !== 'username') {
             $rules[$this->config['username']] = $rules['username'];
             unset($rules['username']);
@@ -219,7 +226,7 @@ class ApiAuthController extends Controller
      */
     private function getRegisterValidationRules()
     {
-        $rules = $this->config['register-validation'];
+        $rules = $this->config['register']['validation'];
         if ($this->config['username'] !== 'username') {
             $rules[$this->config['username']] = $rules['username'];
             unset($rules['username']);
@@ -233,7 +240,8 @@ class ApiAuthController extends Controller
      */
     private function getRegistrationFields()
     {
-        return $this->config['registration.fields'];
+        $fields = $this->config['register']['fields'] ?? [];
+        return count($fields) ? $fields : array_keys($this->config['register']['validation']);
     }
 
     /**
@@ -241,7 +249,7 @@ class ApiAuthController extends Controller
      */
     private function passwordRequiredForRegistration()
     {
-        return in_array('password', $this->config['registration.fields']);
+        return in_array('password', $this->getRegistrationFields());
     }
 
     /**
@@ -263,7 +271,7 @@ class ApiAuthController extends Controller
     private function requestHasInvalidClientId($request = null)
     {
         $request = $request ?? request();
-        return $this->validateClientId(request($request)) === false;
+        return $this->validateClientId($request) === false;
     }
 }
 
