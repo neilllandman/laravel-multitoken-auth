@@ -33,7 +33,6 @@ class VerifyApiTokenExpired
             $user = $guard->user();
             $token = $guard->token();
             if ($token) {
-//                dd($token);
                 if ($token->expires_at !== null && $token->expires_at->lt(now())) {
                     $token->expire();
                     return response()->json([
@@ -44,7 +43,6 @@ class VerifyApiTokenExpired
                 }
             }
         }
-//        dd($guard->token());
         return $next($request);
     }
 }

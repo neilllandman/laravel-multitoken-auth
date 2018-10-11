@@ -63,7 +63,6 @@ class TokensGuard extends TokenGuard
         $token->setExpiresAt();
         $this->fireLoginEvent($user, $remember);
         $user->apiTokens()->save($token);
-        dd($token);
         $this->setUser($user);
         $this->setToken($token);
     }
