@@ -81,8 +81,15 @@ return [
         'password-update' => 'password/update',
     ],
 
+    /*
+     * Whether or not the api tokens should expire.
+     */
     'tokens_expire' => true,
 
+    /*
+     * How long it takes for a token to expire. Tokens get refreshed everytime they are used. Hence, a
+     * lifetime of 14400 minutes will cause the token to expire if it hasn't been used for 10 days
+     */
     'token_lifetime' => 14400,
 
     /*
