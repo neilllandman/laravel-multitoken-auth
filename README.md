@@ -165,7 +165,12 @@ Publish config/multipletokens.php.
 <tr>
 <td>login-validation</td>
 <td>The validation array to use when logging in.</td>
-<td>*See validation</td>
+<td>
+
+    'username' => 'required|email|string',
+    'password' => 'required|string',
+
+</td>
 </tr>
 
 <td>tables</td>
