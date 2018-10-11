@@ -47,12 +47,9 @@ class ApiAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $rules = $this->getLoginValidationRules();
-        $this->validate($request, $rules);
+        $this->validate($request, $this->getLoginValidationRules());
 
-        $clientIds = ApiClient::pluck('value')->toArray();
-
-        if (in_array($request->input('client_id'), $clientIds) === false) {
+        if ($this->requestHasInvalidClientId()) {
             return response()->json(['message' => Lang::get('auth.failed')], 401);
         }
 
@@ -91,19 +88,21 @@ class ApiAuthController extends Controller
      */
     public function register(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $this->validate($request, $this->getRegisterValidationRules());
 
-        $user = $this->user->create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
-        ]);
+        if ($this->requestHasInvalidClientId()) {
+            return response()->json(['message' => Lang::get('auth.failed')], 401);
+        }
 
-        if ($this->guard->attempt($request->only(['email', 'password']), $remember)) {
+        $userData = $request->only($this->getRegistrationFields());
+
+        if ($this->passwordRequiredForRegistration()) {
+            $userData['password'] = bcrypt($request->input('password'));
+        }
+
+        $user = $this->user->create($userData);
+
+        if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
     }
@@ -133,7 +132,6 @@ class ApiAuthController extends Controller
             $refresh_token = $apiToken->refresh_token;
             $expires_at = $apiToken->expires_at;
         }
-
         return response()->json(compact('user', 'token', 'refresh_token', 'expires_at'));
     }
 
@@ -203,15 +201,69 @@ class ApiAuthController extends Controller
 //    }
 
     /**
-     * @return mixed
+     * @return array
      */
     private function getLoginValidationRules()
     {
-        $rules = $this->config['login-validation'];
-        $rules[$this->config['username']] = $rules['username'];
-        unset($rules['username']);
+        $rules = $this->config['login.validation'];
+        if ($this->config['username'] !== 'username') {
+            $rules[$this->config['username']] = $rules['username'];
+            unset($rules['username']);
+        }
 
         return $rules;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRegisterValidationRules()
+    {
+        $rules = $this->config['register-validation'];
+        if ($this->config['username'] !== 'username') {
+            $rules[$this->config['username']] = $rules['username'];
+            unset($rules['username']);
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRegistrationFields()
+    {
+        return $this->config['registration.fields'];
+    }
+
+    /**
+     * @return bool
+     */
+    private function passwordRequiredForRegistration()
+    {
+        return in_array('password', $this->config['registration.fields']);
+    }
+
+    /**
+     * @param $request
+     * @return bool
+     */
+    private function requestHasValidClientId($request = nulll)
+    {
+        $request = $request ?? request();
+
+        $clientIds = ApiClient::pluck('value')->toArray();
+        return in_array($request->input('client_id'), $clientIds);
+    }
+
+    /**
+     * @param null $request
+     * @return bool
+     */
+    private function requestHasInvalidClientId($request = null)
+    {
+        $request = $request ?? request();
+        return $this->validateClientId(request($request)) === false;
     }
 }
 

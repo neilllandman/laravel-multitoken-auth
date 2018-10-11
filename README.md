@@ -163,7 +163,7 @@ Publish config/multipletokens.php.
 <td>email</td>
 </tr>
 <tr>
-<td>login-validation</td>
+<td>login.validation</td>
 <td>The validation array to use when logging in.</td>
 <td>
 
