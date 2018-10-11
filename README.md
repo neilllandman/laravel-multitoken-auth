@@ -251,14 +251,36 @@ To hook into the login and register functions, you should publish the configurat
         .
     }
 
-This trait exposes the following methods all of which receives the current request as the only parameter.
+This trait exposes the following methods, all of which receives the current request as the only parameter and must return the user.
 <table>
+<thead>
+<tr><th>Method Name</th><th>Description</th><tr>
+</thead>
+<tbody>
+<tr><td><code>beforeApiRegistered</code></td><td>Runs before the model is saved. (You can save the user inside the method as well).</td><tr>
 <tr><td><code>afterApiRegistered</code></td><td>Runs after successful registeration.</td><tr>
 <tr><td><code>afterApiLogin</code></td><td>Runs after successful login.</td><tr>
 <tr><td><code>afterApiLogout</code></td><td>Runs after successful logout.</td><tr>
+</tbody>
 </table>
 
-Example: Assigning a role to a newly created user after registration
+Example:
 
-
+    class User extends Model {
+        .
+        .
+        .
+        
+        public function afterApiLogin($request)
+        {
+            $this->update(['last_login_at' => now()]);
+            return $this;
+        }
+        
+        public function afterApiRegistered($request)
+        {
+            $this->assignRole($request->input('role'));
+            return $this;
+        }
+    }
  

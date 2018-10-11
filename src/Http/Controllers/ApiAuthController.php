@@ -40,7 +40,7 @@ class ApiAuthController extends Controller
     {
         $this->guard = Auth::guard('api');
         $this->config = Config::get('multipletokens');
-        $this->shouldFireEvents = $this->config(['model-is-listening']);
+        $this->shouldFireEvents = $this->config['model-is-listening'];
         $this->user = app()->make($this->config['model']);
     }
 
@@ -58,7 +58,7 @@ class ApiAuthController extends Controller
 
         $remember = $request->has('remember') && $request->input('remember');
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
-            $this->handleEvent($request, $this->guard->user, 'afterApiLogin');
+            $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
 
@@ -83,9 +83,11 @@ class ApiAuthController extends Controller
      */
     public function logoutAll(Request $request)
     {
+        $user = $this->guard->user();
         $this->guard->logout();
         $count = $request->user()->apiTokens()->delete();
-        return response()->json(['count' => $count, 'success' => 1]);
+        $this->handleEvent($request, $user, 'afterApiLogout');
+        return response()->json(['count' => $count + 1, 'success' => 1]);
     }
 
     /**
@@ -133,7 +135,7 @@ class ApiAuthController extends Controller
      */
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        return response()->json($request->user()->toApiFormat());
     }
 
     /**
@@ -241,8 +243,12 @@ class ApiAuthController extends Controller
      */
     private function getRegistrationFields()
     {
-        $fields = $this->config['register']['fields'] ?? [];
-        return count($fields) ? $fields : array_keys($this->config['register']['validation']);
+        $registerConfig = $this->config['register'];
+        if ($registerConfig['usefillable']) {
+            return $this->user->getFillable();
+        }
+        $fields = $registerConfig['fields'] ?? [];
+        return count($fields) ? $fields : array_keys($registerConfig['validation']);
     }
 
     /**
@@ -284,9 +290,8 @@ class ApiAuthController extends Controller
     private function handleEvent(Request $request, $user, $eventName)
     {
         if ($this->shouldFireEvents) {
-            $user->{eventName}($request);
-            return true;
+            $user = $user->{$eventName}($request);
         }
-        return false;
+        return $user;
     }
 }
