@@ -155,8 +155,8 @@ class ApiAuthController extends Controller
 
         $token = $apiToken->token;
         if ($apiToken->expires_at !== null && !$apiToken->should_forget) {
-            $refresh_token = $apiToken->refresh_token;
-            $expires_at = $apiToken->expires_at;
+//            $refresh_token = $apiToken->refresh_token;
+            $expires_at = $apiToken->expires_at->toDateTimeString();
         }
         return response()->json(compact('user', 'token', 'refresh_token', 'expires_at'));
     }
