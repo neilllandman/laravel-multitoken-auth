@@ -38,10 +38,14 @@ return [
      * Register configuration.
      */
     'register' => [
-        /* The fields that will be passed to the create method of the given Eloquent model. Note
+        /*
+         * The fields that will be passed to the create method of the given Eloquent model. Note
          * that if the password field is present it will be encrypted using bcrypt().
+         * The keys in the validation array (see below) is used by default, but you
+         * can uncomment this line if need be.
          */
-        'fields' => ['name', 'email', 'password'],
+        
+//        'fields' => ['name', 'email', 'password'],
 
         /*
          * Validation rules to use upon registration. If the 'fields' array above
