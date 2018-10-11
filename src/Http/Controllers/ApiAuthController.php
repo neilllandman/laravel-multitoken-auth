@@ -2,6 +2,7 @@
 
 namespace Landman\MultiTokenAuth\Http\Controllers;
 
+use Illuminate\Support\Facades\Password;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
@@ -47,13 +48,14 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
     {
         $this->validate($request, $this->getLoginValidationRules());
 
         if ($this->requestHasInvalidClientId()) {
-            return response()->json(['message' => Lang::get('auth.failed')], 401);
+            return $this->invalidClientIdResponse();
         }
 
         $remember = $request->has('remember') && $request->input('remember');
@@ -62,7 +64,9 @@ class ApiAuthController extends Controller
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
 
-        return response()->json(['message' => Lang::get('auth.failed')], 401);
+        return response()->json([
+            'message' => trans('auth.failed')
+        ], 401);
     }
 
     /**
@@ -100,7 +104,7 @@ class ApiAuthController extends Controller
         $this->validate($request, $this->getRegisterValidationRules());
 
         if ($this->requestHasInvalidClientId()) {
-            return response()->json(['message' => Lang::get('auth.failed')], 401);
+            return $this->invalidClientIdResponse();
         }
 
         $userData = $request->only($this->getRegistrationFields());
@@ -108,6 +112,7 @@ class ApiAuthController extends Controller
         if ($this->passwordRequiredForRegistration()) {
             $userData['password'] = bcrypt($request->input('password'));
         }
+
         try {
             DB::beginTransaction();
 
@@ -160,29 +165,29 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function updatePassword(Request $request)
     {
         $user = $request->user();
 
         $this->validate($request, [
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        DB::beginTransaction();
-
         try {
+            DB::beginTransaction();
             $user->update([
                 'password' => bcrypt($request->password)
             ]);
             DB::commit();
-            return response()->json(['message' => Lang::get('passwords.updated')]);
+            return response()->json(['message' => trans('Your password has been updated.')]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getTraceAsString());
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => Lang::get('errors.general'),
+                'message' => trans('errors.general'),
             ], 500);
         }
     }
@@ -214,10 +219,10 @@ class ApiAuthController extends Controller
 //                    $message = "Invalid refresh token.";
 //                }
 //            } else {
-//                $message = Lang::get('auth.failed');
+//                $message = trans('auth.failed');
 //            }
 //        } else {
-//            $message = Lang::get('auth.unsupported_grant_type') . " " . $request->input('grant_type') . ".";
+//            $message = trans('auth.unsupported_grant_type') . " " . $request->input('grant_type') . ".";
 //        }
 //        return response()->json(compact('message'), 422);
 //    }
@@ -282,6 +287,14 @@ class ApiAuthController extends Controller
     }
 
     /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function invalidClientIdResponse()
+    {
+        return response()->json(['message' => 'Invalid client id specified.'], 401);
+    }
+
+    /**
      * @param $request
      * @param $user
      * @param $eventName
@@ -293,5 +306,40 @@ class ApiAuthController extends Controller
             $user = $user->{$eventName}($request);
         }
         return $user;
+    }
+
+
+    /**
+     * Send a reset link to the given user.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email',
+        ]);
+
+        if ($this->user->where('email', $request->input('email'))->count() === 0) {
+            return response()->json([
+                'message' => 'We can\'t find a user with that e-mail address.'
+            ], 422);
+        }
+
+        // We will send the password reset link to this user. Once we have attempted
+        // to send the link, we will examine the response then see the message we
+        // need to show to the user. Finally, we'll send out a proper response.
+        $broker = Password::broker();
+        $response = $broker->sendResetLink(
+            $request->only('email')
+        );
+
+        return $response == Password::RESET_LINK_SENT
+            ? response()->json([
+                'message' => trans('passwords.sent')
+            ])
+            : response()->json(['message' => ''], 500);
     }
 }

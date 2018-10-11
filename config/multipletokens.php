@@ -59,7 +59,7 @@ return [
         'validation' => [
             'name' => 'required|string|min:2',
             'email' => 'required|email|string|unique:users',
-            'password' => 'required|string|min:12|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ],
     ],
 
@@ -82,6 +82,9 @@ return [
             'logout' => '/auth/logout',
             'logout-all' => '/auth/logout-all',
             'token-refresh' => 'token/refresh',
+            'password-email' => 'password/email',
+            'password-reset' => 'password/reset',
+            'password-update' => 'password/update',
         ],
     ],
 

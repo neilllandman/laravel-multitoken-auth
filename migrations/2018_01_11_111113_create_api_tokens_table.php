@@ -21,7 +21,9 @@ class CreateApiTokensTable extends Migration
             $table->string('token');
             $table->string('refresh_token')->nullable();
             $table->boolean('remember')->default(0);
-            $table->dateTime('expires_at')->nullable();
+            $table->dateTime('expires_at');
+            $table->string('user_agent');
+            $table->string('device')->default('Unknown');
             $table->timestamps();
 
             $table->index('user_id');
