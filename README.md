@@ -12,7 +12,7 @@ Add the following at the bottom of your composer.json to access the repo
 
 
 then run 
-<br><code>composer require neilllandman/laravel-multitoken-auth</code>
+<br><code>composer require neilllandman/laravel-multitoken-auth:"^1.0"</code>
 
 Run migrations:
 <br><code>php artisan migrate</code>

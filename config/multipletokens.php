@@ -44,7 +44,7 @@ return [
          * The keys in the validation array (see below) is used by default, but you
          * can uncomment this line if need be.
          */
-        
+
 //        'fields' => ['name', 'email', 'password'],
 
         /*
