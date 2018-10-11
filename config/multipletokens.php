@@ -21,8 +21,8 @@ return [
      * Table names used for migrations.
      */
     'tables' => [
-        'api_clients' => 'api_clients',
-        'api_tokens' => 'api_tokens'
+        'clients' => 'api_clients',
+        'tokens' => 'api_tokens'
     ],
 
     /*

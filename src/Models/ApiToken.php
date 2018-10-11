@@ -234,6 +234,6 @@ class ApiToken extends Model
     public function getTable()
     {
         parent::getTable();
-        return Config::get('multipletokens.tables.api_tokens');
+        return Config::get('multipletokens.tables.tokens');
     }
 }

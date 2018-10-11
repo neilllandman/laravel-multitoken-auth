@@ -13,7 +13,7 @@ class CreateApiTokensTable extends Migration
      */
     public function up()
     {
-        Schema::create(\Illuminate\Support\Facades\Config::get('multipletokens.tables.api_tokens'), function (Blueprint $table) {
+        Schema::create(\Illuminate\Support\Facades\Config::get('multipletokens.tables.tokens'), function (Blueprint $table) {
             $table->uuid('id');
             $table->primary('id');
 
@@ -36,6 +36,6 @@ class CreateApiTokensTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(\Illuminate\Support\Facades\Config::get('multipletokens.tables.api_tokens'));
+        Schema::dropIfExists(\Illuminate\Support\Facades\Config::get('multipletokens.tables.tokens'));
     }
 }
