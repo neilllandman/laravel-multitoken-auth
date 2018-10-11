@@ -57,7 +57,7 @@ class TokensGuard extends TokenGuard
     public function login(Authenticatable $user, $remember = false)
     {
         $remember = $remember || !config('auth.api_tokens_expire');
-        $token = new ApiToken(compact('remember'));
+        $token = new ApiToken([compact('remember')]);
         $this->fireLoginEvent($user, $remember);
         $user->apiTokens()->save($token);
         $this->setUser($user);
