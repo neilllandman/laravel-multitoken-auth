@@ -3,7 +3,7 @@
 namespace Landman\MultiTokenAuth\Providers;
 
 
-use Illuminate\Support\ServiceProvider as MainServiceProvider;
+use Illuminate\Support\ServiceProvider as SupportServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
