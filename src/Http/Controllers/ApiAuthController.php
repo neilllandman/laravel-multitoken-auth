@@ -58,8 +58,7 @@ class ApiAuthController extends Controller
             return $this->invalidClientIdResponse();
         }
 
-        $remember = $request->has('remember') && $request->input('remember');
-        if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $remember)) {
+        if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
@@ -123,7 +122,7 @@ class ApiAuthController extends Controller
 
             DB::commit();
 
-            if ($this->guard->attempt($request->only([$this->config['username'], 'password']))) {
+            if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
                 $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
                 return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
             }

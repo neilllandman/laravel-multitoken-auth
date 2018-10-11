@@ -34,14 +34,14 @@ class TokensGuard extends TokenGuard
      * Attempt to authenticate a user using the given credentials.
      *
      * @param  array $credentials
-     * @param  bool $remember
+     * @param  Request $request
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false)
+    public function attempt(array $credentials = [], Request $request = null)
     {
         $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
         if ($this->hasValidCredentials($user, $credentials)) {
-            $this->login($user, $remember);
+            $this->login($user, $request);
             return true;
         }
         return false;
@@ -51,13 +51,15 @@ class TokensGuard extends TokenGuard
      * Log a user into the application.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param  bool $remember
-     * @return void
+     * @param Request $request
      */
-    public function login(Authenticatable $user, $remember = false)
+    public function login(Authenticatable $user, Request $request)
     {
-        $remember = $remember || !config('auth.api_tokens_expire');
-        $token = new ApiToken([compact('remember')]);
+        $remember = $request->has('remember') || !config('auth.api_tokens_expire');
+        $user_agent = $request->header('user-agent') ?? 'Unknown';
+        $device = $request->input('device') ?? 'Unknown';
+
+        $token = new ApiToken(compact('remember', 'user_agent', 'device'));
         $this->fireLoginEvent($user, $remember);
         $user->apiTokens()->save($token);
         $this->setUser($user);
