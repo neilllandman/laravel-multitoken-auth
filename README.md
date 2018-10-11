@@ -194,11 +194,19 @@ Publish config/multipletokens.php.
 </td>
 </tr>
 <tr>
-<td>register.validation</td>
+<td>register.fields</td>
 <td>The fields that will be passed to the create method of the given Eloquent model. Note that if the password field is present it will be encrypted using bcrypt().</td>
 <td>
 
     ['name','email','password'],
+</td>
+</tr>
+
+<tr>
+<td>register.usefillable</td>
+<td>Use the fillable array specified on the User model.</td>
+<td>
+false
 </td>
 </tr>
 

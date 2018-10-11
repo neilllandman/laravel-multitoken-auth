@@ -50,7 +50,7 @@ return [
         /*
          * You can also specify the fields passed to be the fillable array declared on your User model.
          */
-//    'usefillable' => true,
+        'usefillable' => false,
 
         /*
          * Validation rules to use upon registration. If the 'fields' array above
