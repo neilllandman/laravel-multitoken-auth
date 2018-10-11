@@ -3,9 +3,14 @@
 return [
 
     /*
-     * Eloquent model class and username column.
+     * Eloquent model class.
      */
     'model' => 'App\\User',
+
+    /*
+     * Eloquent model username column. This column will be used for
+     * authentication on login.
+     */
     'username' => 'email',
 
     /*
@@ -28,9 +33,8 @@ return [
 
 
     'register' => [
-        /* these fields will be passed to the create method of the given
-         * Eloquent model. Note that if the password field is present it will be
-         * encrypted using bcrypt().
+        /* The fields that will be passed to the create method of the given Eloquent model. Note
+         * that if the password field is present it will be encrypted using bcrypt().
          */
         'fields' => ['name', 'email', 'password'],
 

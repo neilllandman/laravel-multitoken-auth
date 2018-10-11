@@ -212,13 +212,7 @@ class ApiAuthController extends Controller
      */
     private function getLoginValidationRules()
     {
-        $rules = $this->config['login']['validation'];
-        if ($this->config['username'] !== 'username') {
-            $rules[$this->config['username']] = $rules['username'];
-            unset($rules['username']);
-        }
-
-        return $rules;
+        return $this->config['login']['validation'];
     }
 
     /**
@@ -226,13 +220,7 @@ class ApiAuthController extends Controller
      */
     private function getRegisterValidationRules()
     {
-        $rules = $this->config['register']['validation'];
-        if ($this->config['username'] !== 'username') {
-            $rules[$this->config['username']] = $rules['username'];
-            unset($rules['username']);
-        }
-
-        return $rules;
+        return $this->config['register']['validation'];
     }
 
     /**
@@ -271,7 +259,7 @@ class ApiAuthController extends Controller
     private function requestHasInvalidClientId($request = null)
     {
         $request = $request ?? request();
-        return $this->validateClientId($request) === false;
+        return $this->requestHasValidClientId($request) === false;
     }
 }
 
