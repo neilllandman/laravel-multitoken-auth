@@ -84,6 +84,5 @@ class ServiceProvider extends SupportServiceProvider
 //        Auth::resolveUsersUsing(function ($guard = null) {
 //            return Auth::user() ? Auth::user() : Auth::guard('api')->user();
 //        });
-        parent::register();
     }
 }
