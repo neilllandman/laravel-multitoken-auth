@@ -119,14 +119,15 @@ class ApiAuthController extends Controller
             $user->save();
             $this->handleEvent($request, $user, 'afterApiRegistered');
 
+
+            $this->guard->attempt($request->only([$this->config['username'], 'password']), $request);
+            $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
             DB::commit();
 
-            if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
-                $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
-                return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
-            }
+            return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
+
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             throw $e;
         }
 
@@ -185,6 +186,7 @@ class ApiAuthController extends Controller
                 $user->update([
                     'password' => bcrypt($request->password)
                 ]);
+                $user->apiTokens()->delete();
                 DB::commit();
                 return response()->json(['message' => trans('Your password has been updated.')]);
             } else {
@@ -199,41 +201,6 @@ class ApiAuthController extends Controller
             ], 500);
         }
     }
-
-//    /**
-//     * @param Request $request
-//     * @return \Illuminate\Http\JsonResponse
-//     */
-//    public function refreshToken(Request $request)
-//    {
-//        $this->validate($request, [
-//            'grant_type' => 'required',
-//            'refresh_token' => 'required',
-//        ]);
-//        if ($request->input('grant_type') === 'refresh_token') {
-//            $user = User::find($request->input('user_id'));
-//            if ($user) {
-//                $token = null;
-//                $user->apiTokens()->withTrashed()->latest()->each(function ($t) use (&$token, $request) {
-//                    if ($t->equalsEncryptedAttribute('refresh_token', $request->input('refresh_token'))) {
-//                        $token = $t;
-//                        return false;
-//                    }
-//                });
-//                if ($token) {
-//                    $token->refresh();
-//                    return $this->authenticationSuccessful($user, $token);
-//                } else {
-//                    $message = "Invalid refresh token.";
-//                }
-//            } else {
-//                $message = trans('auth.failed');
-//            }
-//        } else {
-//            $message = trans('auth.unsupported_grant_type') . " " . $request->input('grant_type') . ".";
-//        }
-//        return response()->json(compact('message'), 422);
-//    }
 
     /**
      * @return array

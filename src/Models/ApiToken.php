@@ -73,9 +73,9 @@ class ApiToken extends Model
         parent::boot();
 
         static::creating(function (ApiToken $token) {
-            $this->token = $this->generateToken();
-            $this->refresh_token = $this->generateToken();
-            $this->expires_at = $this->generateExpiresAtDate();
+            $token->token = static::generateNewToken();
+            $token->refresh_token = static::generateNewToken();
+            $token->expires_at = self::generateExpiresAtDate();
             return true;
         });
     }
@@ -99,7 +99,7 @@ class ApiToken extends Model
     /**
      * @return \Carbon\Carbon
      */
-    public function generateExpiresAtDate()
+    public static function generateExpiresAtDate()
     {
         return now()->addMinutes(Config::get('multipletokens.token_lifetime', 14400));
     }
@@ -175,7 +175,7 @@ class ApiToken extends Model
      */
     public function updateExpiresAt(): ApiToken
     {
-        $this->update(['expires_at' => $this->generateExpiresAtDate()]);
+        $this->update(['expires_at' => self::generateExpiresAtDate()]);
         return $this;
     }
 
@@ -184,7 +184,7 @@ class ApiToken extends Model
      */
     public function setExpiresAt(): ApiToken
     {
-        $this->expires_at = $this->generateExpiresAtDate();
+        $this->expires_at = self::generateExpiresAtDate();
         return $this;
     }
 
