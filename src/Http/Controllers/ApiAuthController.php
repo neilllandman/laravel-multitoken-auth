@@ -61,7 +61,7 @@ class ApiAuthController extends Controller
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
             if (class_exists("\\Illuminate\\Auth\\Events\\Login"))
-                event(new \Illuminate\Auth\Events\Login($this->guard, $this->guard()->user, false));
+                event(new \Illuminate\Auth\Events\Login($this->guard, $this->guard->user(), false));
 
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
@@ -204,7 +204,7 @@ class ApiAuthController extends Controller
                 $user->update([
                     'password' => bcrypt($request->password)
                 ]);
-                $user->invalidateAllTokens($this->guard()->token());
+                $user->invalidateAllTokens($this->guard->token());
                 DB::commit();
                 return response()->json(['message' => trans('Your password has been updated.')]);
             } else {
