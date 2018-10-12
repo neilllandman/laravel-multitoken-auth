@@ -101,7 +101,7 @@ class ApiToken extends Model
      */
     public static function generateExpiresAtDate()
     {
-        return now()->addMinutes(Config::get('multipletokens.token_lifetime', 14400));
+        return now()->addMinutes(Config::get('multipletokens.token_lifetime', 43200));
     }
 
     /**

@@ -326,7 +326,7 @@ false
 <td>How long it takes for a token to expire. Tokens get refreshed everytime they are used.</td>
 <td>
     
-    14400
+    43200
 </td>
 </tr>
 

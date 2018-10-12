@@ -87,8 +87,8 @@ return [
 
     /*
      * How long it takes for a token to expire. Tokens get refreshed everytime they are used. Hence, a
-     * lifetime of 14400 minutes will cause the token to expire if it hasn't been used for 10 days.
+     * lifetime of 43200 minutes will cause the token to expire if it hasn't been used for 30 days.
      * A value of 0 will disable expiration.
      */
-    'token_lifetime' => env('TOKEN_LIFETIME', 14400),
+    'token_lifetime' => env('TOKEN_LIFETIME', 43200),
 ];
