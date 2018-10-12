@@ -61,7 +61,7 @@ class ApiAuthController extends Controller
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
             if (class_exists("\\Illuminate\\Auth\\Events\\Login"))
-                event(new \Illuminate\Auth\Events\Login($this->guard, $user, false));
+                event(new \Illuminate\Auth\Events\Login($this->guard, $this->guard()->user, false));
 
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
@@ -82,7 +82,7 @@ class ApiAuthController extends Controller
         $this->handleEvent($request, $user, 'afterApiLogout');
 
         if (class_exists("\\Illuminate\\Auth\\Events\\Logout"))
-            event(new \Illuminate\Auth\Events\Logout($this->guard, $user));
+            event(new \Illuminate\Auth\Events\Logout($this->guard, $this->guard->user()));
 
         return response()->json(['success' => 1]);
     }
@@ -99,7 +99,7 @@ class ApiAuthController extends Controller
         $this->handleEvent($request, $user, 'afterApiLogout');
 
         if (class_exists("\\Illuminate\\Auth\\Events\\Logout"))
-            event(new \Illuminate\Auth\Events\Logout($this->guard, $user));
+            event(new \Illuminate\Auth\Events\Logout($this->guard, $this->guard->user()));
 
         return response()->json(['count' => $count + 1, 'success' => 1]);
     }
@@ -133,13 +133,14 @@ class ApiAuthController extends Controller
 
 
             $this->guard->attempt($request->only([$this->config['username'], 'password']), $request);
+
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
-            DB::commit();
             if (class_exists("\\Illuminate\\Auth\\Events\\Registered"))
                 event(new \Illuminate\Auth\Events\Registered($user));
 
             if (class_exists("\\Illuminate\\Auth\\Events\\Login"))
                 event(new \Illuminate\Auth\Events\Login($this->guard, $user, false));
+            DB::commit();
 
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
 
