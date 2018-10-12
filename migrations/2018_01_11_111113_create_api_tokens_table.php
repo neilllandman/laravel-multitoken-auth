@@ -24,6 +24,8 @@ class CreateApiTokensTable extends Migration
             $table->dateTime('expires_at')->nullable();
             $table->string('user_agent')->default('Unknown');
             $table->string('device')->default('Unknown');
+
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index('user_id');

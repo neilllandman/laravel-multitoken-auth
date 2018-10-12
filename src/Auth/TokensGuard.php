@@ -3,7 +3,9 @@
 namespace Landman\MultiTokenAuth\Auth;
 
 use Illuminate\Auth\AuthenticationException;
+use Landman\MultiTokenAuth\Events\ApiAuthenticated;
 use Landman\MultiTokenAuth\Events\ApiAuthenticating;
+use Landman\MultiTokenAuth\Events\ApiLogin;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Auth\TokenGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -177,7 +179,7 @@ class TokensGuard extends TokenGuard
     }
 
     /**
-     * Fire the authenticating event if the dispatcher is set.
+     * Fire the authenticating event.
      *
      * @param ApiToken|null $token
      * @return void
@@ -185,13 +187,13 @@ class TokensGuard extends TokenGuard
     protected function fireAuthenticatingEvent(ApiToken $token = null)
     {
         if ($this->shouldFireEvents === true) {
-            event(new ApiAuthenticating($token));
+            event(new ApiAuthenticating($this));
         }
     }
 
 
     /**
-     * Fire the authenticated event if the dispatcher is set.
+     * Fire the authenticated event.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @return void
@@ -200,12 +202,13 @@ class TokensGuard extends TokenGuard
     {
         if ($this->shouldFireEvents === true && self::$authenticationFired === false) {
             self::$authenticationFired = true;
-            event(new \Illuminate\Auth\Events\Authenticated($this, $user));
+//            event(new \Illuminate\Auth\Events\Authenticated($this, $user));
+            event(new ApiAuthenticated($this));
         }
     }
 
     /**
-     * Fire the login event if the dispatcher is set.
+     * Fire the login event.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @param  bool $remember
@@ -214,7 +217,23 @@ class TokensGuard extends TokenGuard
     protected function fireLoginEvent($user, $remember = false)
     {
         if ($this->shouldFireEvents === true) {
-            event(new \Illuminate\Auth\Events\Login($this, $user, false));
+//            event(new \Illuminate\Auth\Events\Login($this, $user, false));
+            event(new ApiLogin($this));
+        }
+    }
+
+    /**
+     * Fire the logout event.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param  bool $remember
+     * @return void
+     */
+    protected function fireLogoutEvent($user, $remember = false)
+    {
+        if ($this->shouldFireEvents === true) {
+//            event(new \Illuminate\Auth\Events\Login($this, $user, false));
+            event(new ApiLogin($this));
         }
     }
 

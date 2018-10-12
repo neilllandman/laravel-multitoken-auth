@@ -14,7 +14,7 @@ use Landman\MultiTokenAuth\Auth\TokensGuard;
  * Class ApiAuthenticating
  * @package Landman\MultiTokenAuth\Events
  */
-class ApiAuthenticating
+class ApiLogin
 {
     use SerializesModels;
     /** @var TokensGuard */

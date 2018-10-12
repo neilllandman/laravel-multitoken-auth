@@ -230,22 +230,8 @@ class User extends Model {
 
 # Token Expiration
 
-To enable token expiration, add the `\Landman\MultiTokenAuth\Http\Middleware\VerifyApiTokenExpired` middleware to the `$middlewareGroup['api']` array in the App\Http\Kernel file. 
-```
-protected $middlewareGroups = [
-    .
-    .
-    .
-    'api' => [
-        'throttle:60,1',
-        'bindings',
-        VerifyApiTokenExpired::class,
-    ],
-];
-```
+By default all tokens expire after 30 days (43200 minutes). However, this timer is reset on the token everytime it is used for authentication thus it will only expire if it is not used for this time period. If you do not want tokens to expire then you can set the [`token_lifetime`](#configuration) option, or `TOKEN_LIFETIME` environment variable to 0.
     
-Please note that the 'api' middleware must be applied in the `route_middleware` config value (See the [configuration](#configuration) section below - this is set as default).
-
 # Configuration
 
 Please see comments in https://gitlab.com/neilllandman/laravel-multitoken-auth/blob/master/config/multipletokens.php for more information. 

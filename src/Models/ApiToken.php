@@ -66,6 +66,14 @@ class ApiToken extends Model
         return ApiToken::invalid()->delete();
     }
 
+    /**
+     * @return bool
+     */
+    public static function shouldExpire(): bool
+    {
+        return Config::get('multipletokens.token_lifetime') > 0;
+    }
+
 
     /**
      *
