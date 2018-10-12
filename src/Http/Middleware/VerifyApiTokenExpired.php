@@ -9,11 +9,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Session;
 
+/**
+ * Class VerifyApiTokenExpired
+ * @package Landman\MultiTokenAuth\Http\Middleware
+ */
 class VerifyApiTokenExpired
 {
 
+    /**
+     * @var mixed
+     */
     private $guard;
 
+    /**
+     * VerifyApiTokenExpired constructor.
+     */
     function __construct()
     {
         $this->guard = Auth::guard('api');

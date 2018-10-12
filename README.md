@@ -212,6 +212,22 @@ For example, if you would like to restrict access to your API to allow only user
         }
     }
 
+<h2>Token Expiration</h2>
+
+To enable token expiration, add the <code>\Landman\MultiTokenAuth\Http\Middleware\VerifyApiTokenExpired</code> middleware to the <code>$middlewareGroup['api']</code> array in the App\Http\Kernel file. 
+
+    protected $middlewareGroups = [
+        .
+        .
+        .
+        'api' => [
+            'throttle:60,1',
+            'bindings',
+            VerifyApiTokenExpired::class,
+        ],
+    ];
+    
+Please note that the 'api' middleware must be applied in the <code>route_middleware</code> config value (See the configuration section below - this is set as default).
 
 <h2>Configuration</h2>
 
@@ -323,7 +339,7 @@ false
 </tr>
 <tr>
 <td>token_lifetime</td>
-<td>How long it takes for a token to expire. Tokens get refreshed everytime they are used.</td>
+<td>Time it takes for a token to expire in minutes. Tokens get refreshed everytime they are used. Default is 43200 (30 days)</td>
 <td>
     
     43200
