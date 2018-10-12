@@ -203,7 +203,7 @@ class ApiAuthController extends Controller
                 $user->update([
                     'password' => bcrypt($request->password)
                 ]);
-                $user->invalidateAllTokens();
+                $user->invalidateAllTokens($this->guard()->token());
                 DB::commit();
                 return response()->json(['message' => trans('Your password has been updated.')]);
             } else {

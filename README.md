@@ -128,7 +128,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 <tr>
 <td>POST</td>
 <td>/api/password/update</td>
-<td>Update a user's password.</td>
+<td>Update a user's password. This invalidates all api tokens except the current one.</td>
 <td>Yes</td>
 <td>
 

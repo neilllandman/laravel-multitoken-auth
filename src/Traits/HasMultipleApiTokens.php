@@ -20,12 +20,17 @@ trait HasMultipleApiTokens
     }
 
     /**
+     * @param ApiToken|null $except
      * @return int
      */
-    public function invalidateAllTokens()
+    public function invalidateAllTokens(ApiToken $except = null)
     {
-        $count = $this->apiTokens()->count();
-        $this->apiTokens()->each(function (ApiToken $apiToken) {
+        $query = $this->apiTokens();
+        if ($except) {
+            $query = $query->where('id', '!=', $except->id);
+        }
+        $count = $query->count();
+        $query->each(function (ApiToken $apiToken) {
             $apiToken->invalidate();
         });
         return $count;
