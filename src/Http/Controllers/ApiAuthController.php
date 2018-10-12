@@ -137,7 +137,7 @@ class ApiAuthController extends Controller
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
 
-            event(new \Illuminate\Auth\Events\Registered($user));
+//            event(new \Illuminate\Auth\Events\Registered($user));
             event(new ApiRegistered($user));
 
             DB::commit();

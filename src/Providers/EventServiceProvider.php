@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Events\ApiAuthenticated;
@@ -75,6 +76,11 @@ class EventServiceProvider extends ServiceProvider
 
 
         Event::listen(ApiRegistered::class, function (ApiRegistered $event) {
+            if (Config::get('multipletokens.send_verification_email')) {
+                if ($event->user instanceof MustVerifyEmail && !$event->user->hasVerifiedEmail()) {
+                    $event->user->sendEmailVerificationNotification();
+                }
+            }
             logger('ApiRegistered');
         });
 

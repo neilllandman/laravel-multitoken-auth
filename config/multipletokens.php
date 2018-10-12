@@ -58,6 +58,8 @@ return [
         'password' => 'required|string|min:8|confirmed',
     ],
 
+    'register_send_verification_email' => true,
+
 
     /*
      * Route configurations.
