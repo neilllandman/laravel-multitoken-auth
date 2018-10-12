@@ -20,6 +20,18 @@ trait HasMultipleApiTokens
     }
 
     /**
+     * @return int
+     */
+    public function invalidateAllTokens()
+    {
+        $count = $this->apiTokens()->count();
+        $this->apiTokens()->each(function (ApiToken $apiToken) {
+            $apiToken->invalidate();
+        });
+        return $count;
+    }
+
+    /**
      * @return false|\Illuminate\Database\Eloquent\Model
      */
     public function issueToken()
