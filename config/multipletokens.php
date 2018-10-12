@@ -58,7 +58,10 @@ return [
         'password' => 'required|string|min:8|confirmed',
     ],
 
-    'register_send_verification_email' => true,
+    /*
+     * Whether or not to send an email verification mail to the user. Refer to https://laravel.com/docs/5.7/verification
+     */
+    'send_verification_email' => false,
 
 
     /*

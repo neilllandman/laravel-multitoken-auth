@@ -77,7 +77,7 @@ class EventServiceProvider extends ServiceProvider
 
         Event::listen(ApiRegistered::class, function (ApiRegistered $event) {
             if (Config::get('multipletokens.send_verification_email')) {
-                if ($event->user instanceof MustVerifyEmail && !$event->user->hasVerifiedEmail()) {
+                if ($event->user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$event->user->hasVerifiedEmail()) {
                     $event->user->sendEmailVerificationNotification();
                 }
             }

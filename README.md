@@ -306,6 +306,14 @@ false
 </tr>
 
 <tr>
+<td>send_verification_email</td>
+<td>Whether or not to send an email verification mail to the user upon registration. Refer to https://laravel.com/docs/5.7/verification</td>
+<td>false</td>
+</tr>
+
+
+
+<tr>
 <td>route_middleware</td>
 <td>Middleware applied to all routes.</td>
 <td>
@@ -393,7 +401,21 @@ Example:
         }
     }
  
-In addition, the default Laravel `\Illuminate\Auth\Events\Login`, `\Illuminate\Auth\Events\Logout` and `\Illuminate\Auth\Events\Registered` events get fired.
+In addition, the following events are also fired 
+<table>
+<thead>
+<tr><th>Event</th></tr>
+</thead>
+<tbody>
+<tr><td>Landman\MultiTokenAuth\Events\ApiAuthenticated</td></tr>
+<tr><td>Landman\MultiTokenAuth\Events\ApiAuthenticating</td></tr>
+<tr><td>Landman\MultiTokenAuth\Events\ApiLogin</td></tr>
+<tr><td>Landman\MultiTokenAuth\Events\ApiLogout</td></tr>
+<tr><td>Landman\MultiTokenAuth\Events\ApiRegistered</td></tr>
+
+</tbody>
+</table>                 
+
 
 The package also listens to the `\Illuminate\Auth\Events\PasswordReset` event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see `invalidateAllTokens` under [Models](#models)).
 
