@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Password;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
+use Landman\MultiTokenAuth\Events\ApiRegistered;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
@@ -135,7 +136,9 @@ class ApiAuthController extends Controller
 
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
+
             event(new \Illuminate\Auth\Events\Registered($user));
+            event(new ApiRegistered($user));
 
             DB::commit();
 

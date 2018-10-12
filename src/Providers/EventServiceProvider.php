@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Event;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Events\ApiAuthenticated;
 use Landman\MultiTokenAuth\Events\ApiAuthenticating;
+use Landman\MultiTokenAuth\Events\ApiLogin;
+use Landman\MultiTokenAuth\Events\ApiRegistered;
 use Landman\MultiTokenAuth\Models\ApiToken;
 
 /**
@@ -46,6 +48,7 @@ class EventServiceProvider extends ServiceProvider
         });
 
         Event::listen(ApiAuthenticating::class, function (ApiAuthenticating $event) {
+            logger('ApiAuthenticating');
             if (ApiToken::shouldExpire()) {
                 $token = $event->guard->token();
                 if ($token) {
@@ -58,9 +61,21 @@ class EventServiceProvider extends ServiceProvider
         });
 
         Event::listen(ApiAuthenticated::class, function (ApiAuthenticated $event) {
-            if ($event->guard instanceof TokensGuard) {
-                $event->guard->token()->updateExpiresAt();
-            }
+            logger('ApiAuthenticated');
+            $event->guard->token()->updateExpiresAt();
+        });
+
+        Event::listen(ApiLogin::class, function (ApiLogin $event) {
+            logger('ApiLogin');
+        });
+
+        Event::listen(ApiLogout::class, function (ApiLogout $event) {
+            logger('ApiLogout');
+        });
+
+
+        Event::listen(ApiRegistered::class, function (ApiRegistered $event) {
+            logger('ApiRegistered');
         });
 
         parent::boot();

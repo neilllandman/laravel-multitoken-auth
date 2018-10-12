@@ -137,7 +137,7 @@ class TokensGuard extends TokenGuard
         if ($user) {
             $this->token()->invalidate();
             session()->invalidate();
-            event(new \Illuminate\Auth\Events\Logout($this, $this->user()));
+            $this->fireLogoutEvent($user);
         }
         return $this->token();
     }
@@ -232,8 +232,8 @@ class TokensGuard extends TokenGuard
     protected function fireLogoutEvent($user, $remember = false)
     {
         if ($this->shouldFireEvents === true) {
-//            event(new \Illuminate\Auth\Events\Login($this, $user, false));
-            event(new ApiLogin($this));
+//            event(new \Illuminate\Auth\Events\Logout($this, $this->user()));
+            event(new ApiLogout($this));
         }
     }
 
