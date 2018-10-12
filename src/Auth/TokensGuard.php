@@ -2,6 +2,8 @@
 
 namespace Landman\MultiTokenAuth\Auth;
 
+use Illuminate\Auth\AuthenticationException;
+use Landman\MultiTokenAuth\Events\ApiAuthenticating;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Auth\TokenGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -14,6 +16,8 @@ use Illuminate\Http\Request;
  * User: neilllandman
  * Date: 2018/03/07
  * Time: 08:27
+ *
+ * @method user()
  */
 class TokensGuard extends TokenGuard
 {
@@ -25,10 +29,27 @@ class TokensGuard extends TokenGuard
      */
     protected $events;
 
+    protected static $authenticationFired = false;
+
     /**
      * @var string
      */
     protected $token;
+
+    /**
+     * Create a new authentication guard.
+     *
+     * @param  \Illuminate\Contracts\Auth\UserProvider $provider
+     * @param  \Illuminate\Http\Request $request
+     * @param  string $inputKey
+     * @param  string $storageKey
+     * @return void
+     */
+    public function __construct(UserProvider $provider, Request $request, $inputKey = 'api_token', $storageKey = 'api_token')
+    {
+        $this->shouldFireEvents = true;
+        parent::__construct($provider, $request, $inputKey, $storageKey);
+    }
 
     /**
      * Attempt to authenticate a user using the given credentials.
@@ -41,6 +62,7 @@ class TokensGuard extends TokenGuard
     {
         $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
         if ($this->hasValidCredentials($user, $credentials)) {
+//            $this->fireAuthenticatedEvent($user);
             $this->login($user, $request);
             return true;
         }
@@ -61,10 +83,15 @@ class TokensGuard extends TokenGuard
 
         $token = new ApiToken(compact('remember', 'user_agent', 'device'));
         $token->setExpiresAt();
-        $this->fireLoginEvent($user, $remember);
         $user->apiTokens()->save($token);
         $this->setUser($user);
+        $this->fireLoginEvent($user, $remember);
         $this->setToken($token);
+    }
+
+    public function authenticate()
+    {
+        return parent::authenticate();
     }
 
     /**
@@ -99,7 +126,8 @@ class TokensGuard extends TokenGuard
     }
 
     /**
-     * @return string
+     * @return ApiToken
+     * @throws \Exception
      */
     public function logout()
     {
@@ -107,12 +135,28 @@ class TokensGuard extends TokenGuard
         if ($user) {
             $this->token()->invalidate();
             session()->invalidate();
+            event(new \Illuminate\Auth\Events\Logout($this, $this->user()));
         }
         return $this->token();
     }
 
     /**
-     * @return string
+     * Determine if the current user is authenticated.
+     *
+     * @return bool
+     */
+    public function check()
+    {
+        $check = !is_null($this->user());
+        $this->fireAuthenticatingEvent($this->token());
+        if ($check) {
+            $this->fireAuthenticatedEvent($this->user());
+        }
+        return $check;
+    }
+
+    /**
+     * @return ApiToken
      */
     public function token()
     {
@@ -133,15 +177,18 @@ class TokensGuard extends TokenGuard
     }
 
     /**
-     * Set the event dispatcher instance.
+     * Fire the authenticating event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher $events
+     * @param ApiToken|null $token
      * @return void
      */
-    public function setDispatcher(Dispatcher $events)
+    protected function fireAuthenticatingEvent(ApiToken $token = null)
     {
-        $this->events = $events;
+        if ($this->shouldFireEvents === true) {
+            event(new ApiAuthenticating($token));
+        }
     }
+
 
     /**
      * Fire the authenticated event if the dispatcher is set.
@@ -151,8 +198,9 @@ class TokensGuard extends TokenGuard
      */
     protected function fireAuthenticatedEvent($user)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new \Illuminate\Auth\Events\Authenticated($user));
+        if ($this->shouldFireEvents === true && self::$authenticationFired === false) {
+            self::$authenticationFired = true;
+            event(new \Illuminate\Auth\Events\Authenticated($this, $user));
         }
     }
 
@@ -165,9 +213,8 @@ class TokensGuard extends TokenGuard
      */
     protected function fireLoginEvent($user, $remember = false)
     {
-        if (isset($this->events)) {
-            $this->events->dispatch(new \Illuminate\Auth\Events\Login($user));
-//            $this->events->dispatch(new Events\Login($user, $remember));
+        if ($this->shouldFireEvents === true) {
+            event(new \Illuminate\Auth\Events\Login($this, $user, false));
         }
     }
 

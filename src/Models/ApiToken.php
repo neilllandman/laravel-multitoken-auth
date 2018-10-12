@@ -3,6 +3,7 @@
 namespace Landman\MultiTokenAuth\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Traits\HasUuidKey;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Crypt;
 class ApiToken extends Model
 {
     use HasUuidKey;
+    use SoftDeletes;
 
     /** @var bool */
     public static $snakeAttributes = false;

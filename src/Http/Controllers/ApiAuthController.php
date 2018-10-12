@@ -2,7 +2,10 @@
 
 namespace Landman\MultiTokenAuth\Http\Controllers;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Password;
+use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
@@ -16,6 +19,7 @@ use Landman\MultiTokenAuth\Models\ApiClient;
 /**
  * Class ApiAuthController
  * @package Landman\MultiTokenAuth
+ * @property TokensGuard $guard
  */
 class ApiAuthController extends Controller
 {
@@ -60,9 +64,6 @@ class ApiAuthController extends Controller
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
-            if (class_exists("\\Illuminate\\Auth\\Events\\Login"))
-                event(new \Illuminate\Auth\Events\Login($this->guard, $this->guard->user(), false));
-
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
         }
 
@@ -74,15 +75,13 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function logout(Request $request)
     {
         $user = $this->guard->user();
         $this->guard->logout();
         $this->handleEvent($request, $user, 'afterApiLogout');
-
-        if (class_exists("\\Illuminate\\Auth\\Events\\Logout"))
-            event(new \Illuminate\Auth\Events\Logout($this->guard, $this->guard->user()));
 
         return response()->json(['success' => 1]);
     }
@@ -135,11 +134,9 @@ class ApiAuthController extends Controller
             $this->guard->attempt($request->only([$this->config['username'], 'password']), $request);
 
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
-            if (class_exists("\\Illuminate\\Auth\\Events\\Registered"))
-                event(new \Illuminate\Auth\Events\Registered($user));
 
-            if (class_exists("\\Illuminate\\Auth\\Events\\Login"))
-                event(new \Illuminate\Auth\Events\Login($this->guard, $user, false));
+            event(new \Illuminate\Auth\Events\Registered($user));
+
             DB::commit();
 
             return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
@@ -200,7 +197,7 @@ class ApiAuthController extends Controller
                 "{$userNameField}" => $user->{$userNameField},
                 'password' => $request->input('current_password'),
             ];
-            if ($this->guard->hasValidCredentials($user, $credentials)) {
+            if ($this->guard->getProvider()->validateCredentials($user, $credentials)) {
                 $user->update([
                     'password' => bcrypt($request->password)
                 ]);
@@ -290,7 +287,7 @@ class ApiAuthController extends Controller
      * @param $request
      * @param $user
      * @param $eventName
-     * @return bool
+     * @return Authenticatable
      */
     private function handleEvent(Request $request, $user, string $eventName)
     {
