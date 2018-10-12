@@ -416,9 +416,8 @@ If you would like to register your own listeners, you can attach them to the fol
 <tr><td>Landman\MultiTokenAuth\Events\ApiLogin</td></tr>
 <tr><td>Landman\MultiTokenAuth\Events\ApiLogout</td></tr>
 <tr><td>Landman\MultiTokenAuth\Events\ApiRegistered</td></tr>
-
 </tbody>
-</table>                 
+</table>        
 
 
 The package also listens to the `\Illuminate\Auth\Events\PasswordReset` event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see `invalidateAllTokens` under [Models](#models)).
