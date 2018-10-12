@@ -194,6 +194,8 @@ Response:
 <h2>Models</h2>
 The user's api tokens can be retrieved via the <code>$user->apiTokens()</code> relationship.
 
+You can invalidate all api tokens for a user by calling <code>$user->invalidateAllTokens()</code>.
+
 To manually issue an ApiToken to a user, the <code>$user->issueToken()</code> method can be used. This method returns an instance of <code>\Landman\MultiTokenAuth\Models\ApiToken</code>.
 
 To further validate if a user can access the API, you can override the <code>canAccessApi()</code> method available from the <code>HasMultipleApiTokens</code> trait.
@@ -373,3 +375,6 @@ Example:
         }
     }
  
+In addition, the default Laravel <code>\Illuminate\Auth\Events\Login</code>, <code>\Illuminate\Auth\Events\Logout</code> and <code>\Illuminate\Auth\Events\Registered </code>events get fired.
+
+The package also listens to the <code>\Illuminate\Auth\Events\PasswordReset</code> event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see <code>invalidateAllTokens</code> under Models).
