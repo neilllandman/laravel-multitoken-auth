@@ -6,11 +6,10 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Event;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Events\ApiAuthenticated;
 use Landman\MultiTokenAuth\Events\ApiAuthenticating;
@@ -58,7 +57,7 @@ class EventServiceProvider extends ServiceProvider
             }
         });
 
-        Event::listen(ApiAuthenticated::class, function (Authenticated $event) {
+        Event::listen(ApiAuthenticated::class, function (ApiAuthenticated $event) {
             if ($event->guard instanceof TokensGuard) {
                 $event->guard->token()->updateExpiresAt();
             }
