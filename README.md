@@ -359,6 +359,8 @@ false
 </table>
 
 # Events
+
+### Via the ListensOnApiEvents Trait
 To hook into the login and register functions, add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
 
     class User extends Model {
@@ -401,7 +403,9 @@ Example:
         }
     }
  
-In addition, the following events are also fired 
+### Via Listeners
+If you would like to register your own listeners, you can attach them to the following events
+ 
 <table>
 <thead>
 <tr><th>Event</th></tr>
