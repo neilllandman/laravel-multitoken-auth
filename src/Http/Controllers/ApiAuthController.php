@@ -41,7 +41,6 @@ class ApiAuthController extends Controller
     {
         $this->guard = Auth::guard('api');
         $this->config = Config::get('multipletokens');
-        $this->shouldFireEvents = $this->config['model_is_listening'];
         $this->user = app()->make($this->config['model']);
     }
 
@@ -360,6 +359,7 @@ class ApiAuthController extends Controller
         return response()->json(
             $request->user()->apiTokens()->get([
                 'id',
+                'user_agent',
                 'device',
                 'updated_at',
             ])

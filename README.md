@@ -97,7 +97,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 <tr>
 <td>POST</td>
 <td>/api/auth/logout-all</td>
-<td>Logout a user and invalidated all tokens from all devices.</td>
+<td>Logout a user from all their devices and invalidates all tokens.</td>
 <td>Yes</td>
 <td>None</td>
 </tr>
@@ -105,6 +105,13 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 <td>GET|HEAD</td>
 <td>/api/auth/user</td>
 <td>Get the current user's data.</td>
+<td>Yes</td>
+<td>None</td>
+</tr>
+<tr>
+<td>GET|HEAD</td>
+<td>/api/auth/user/api-devices</td>
+<td>Get a list of all devices (<code>id</code>,<code>user_agent</code>,<code>name</code> and timestamps) that the user has logged in from. Device names default to 'Unknown' if not specified on login or register.</td>
 <td>Yes</td>
 <td>None</td>
 </tr>
@@ -304,7 +311,7 @@ false
         'login' => '/auth/login',
         'register' => '/auth/register',
         'user' => '/auth/user',
-        'devices' => '/user/api-devices',
+        'devices' => '/auth/user/api-devices',
         'logout' => '/auth/logout',
         'logout-all' => '/auth/logout-all',
         'password-email' => 'password/email',

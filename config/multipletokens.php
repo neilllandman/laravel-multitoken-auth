@@ -74,11 +74,10 @@ return [
         'login' => '/auth/login',
         'register' => '/auth/register',
         'user' => '/auth/user',
-        'devices' => '/user/api-devices',
+        'devices' => '/auth/user/api-devices',
         'logout' => '/auth/logout',
         'logout-all' => '/auth/logout-all',
         'password-email' => 'password/email',
-        'password-reset' => 'password/reset',
         'password-update' => 'password/update',
     ],
 
