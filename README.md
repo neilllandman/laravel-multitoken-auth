@@ -1,73 +1,88 @@
-# Multiple Tokens
-<h2>Installation</h2>
+# Introduction
+A laravel package that allows simple API authentication by using [client ids](#managing-client-ids) and authorization tokens and provides configurable predefined [routes](#routes). The package also allows
+1. Multiple tokens issued to the same user for different devices.
+2. Managing user devices.
+3. Requesting password reset emails.
+3. Managing client ids via the artisan command line interface.
+4. [Token expiration](#token-expiration) and auto refresh on use.
+5. [Event hooks](#events) for login, logout and register.
+6. Configuring login validation rules.
+7. Configuring registration validation rules and fields.
+
+#### Please read this documentation before jumping into [installation](#installation).
+
+
+# Installation
 
 Add the following at the bottom of your composer.json to access the repo
 
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://gitlab.com/neilllandman/laravel-multitoken-auth.git"
-        }
-    ]
-
-
+```
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://gitlab.com/neilllandman/laravel-multitoken-auth.git"
+    }
+]
+```
 then run 
-<br><code>composer require neilllandman/laravel-multitoken-auth:"^1.0"</code>
+`composer require neilllandman/laravel-multitoken-auth:"^1.0"`
 
 Run migrations:
-<br><code>php artisan migrate</code>
+`php artisan migrate`
 
-Edit config/auth.php:
-
-    'guards' => [
-        ...,
-        'api' => [
-            'driver' => 'multi-tokens',
-            'provider' => 'token-users',
-        ],
+Set the api guard driver and user provider in config/auth.php:
+```
+'guards' => [
+    ...,
+    'api' => [
+        'driver' => 'multi-tokens',
+        'provider' => 'token-users',
     ],
+],
+```
 
+Add trait to User model: `\Landman\MultiTokenAuth\Traits\HasMultipleApiTokens`
+```
+class User extends Model {
+    use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
+    .
+    .
+}
+```
 
-Add trait to User model:
-<br><code>use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;</code>
-
-    class User extends Model {
-        use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
-        .
-        .
-    }
-
-<h2>Managing Client IDs</h2>
-
+# Managing Client IDs
 You can manage clients by using the artisan commands
 
-
-Create API client ID: 
-<br><code>php artisan landman:tokens:make-client {name}</code>
+#### Create API client ID 
+`php artisan landman:tokens:make-client {name}`
 
 Note that the names must be unique.
 
-List Client IDs: 
-<br><code>php artisan landman:tokens:list-clients</code>
-<br>Sample output: 
-    
-    +---------+--------------------------------------+
-    | Name    | Api Client ID                        |
-    +---------+--------------------------------------+
-    | Android | 577e1bbb-dfd7-0000-8b28-e54c536a9738 |
-    | iOS     | 577e1bbf-ef19-0000-bb59-97193ffe088c |
-    +---------+--------------------------------------+
+#### List Client IDs 
+`php artisan landman:tokens:list-clients`
+
+Sample output: 
+```
++---------+--------------------------------------+
+| Name    | Api Client ID                        |
++---------+--------------------------------------+
+| Android | 577e1bbb-dfd7-0000-8b28-e54c536a9738 |
+| iOS     | 577e1bbf-ef19-0000-bb59-97193ffe088c |
++---------+--------------------------------------+
+```
+
+### Delete a Client
+`php artisan landman:tokens:delete-client {name}`
+
+### Refresh a Client 
+this will reset the 'Api Client ID' value
+
+`php artisan landman:tokens:refresh-client {name}`
 
 
-Delete a Client: 
-<br><code>php artisan landman:tokens:delete-client {name}</code>
-
-Refresh a Client (this will reset the 'Api Client ID' value): 
-<br><code>php artisan landman:tokens:refresh-client {name}</code>
-
-
-<h2>Routes</h2>
+# Routes
 Some routes are provided by default. Authenticated routes require an Authorization header with a valid token.
+
 <table>
 <thead>
 <tr><th>Method</th><th>URI</th><th>Description</th><th>Authenticated</th><th>Params</th></tr>
@@ -78,14 +93,14 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 <td>/api/auth/login</td>
 <td>Login a user.</td>
 <td>No</td>
-<td>*See config</td>
+<td>See [Configuration](#configuration)</td>
 </tr>
 <tr>
 <td>POST</td>
 <td>/api/auth/register</td>
 <td>Register a user.</td>
 <td>No</td>
-<td>*See config</td>
+<td>See [Configuration](#configuration)</td>
 </tr>
 <tr>
 <td>POST</td>
@@ -142,7 +157,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 </tbody>
 </table>
 
-<h2>Usage</h2>
+# Usage [WIP]
 
 Login
 <br><code>/api/auth/login</code>
@@ -191,52 +206,53 @@ Response:
 
 
 
-<h2>Models</h2>
-The user's api tokens can be retrieved via the <code>$user->apiTokens()</code> relationship.
+# Models
+The user's api tokens can be retrieved via the `$user->apiTokens()` relationship.
 
-You can invalidate all api tokens for a user by calling <code>$user->invalidateAllTokens()</code>.
+You can invalidate all api tokens for a user by calling `$user->invalidateAllTokens()`.
 
-To manually issue an ApiToken to a user, the <code>$user->issueToken()</code> method can be used. This method returns an instance of <code>\Landman\MultiTokenAuth\Models\ApiToken</code>.
+To manually issue an ApiToken to a user, the `$user->issueToken()` method can be used. This method returns an instance of `\Landman\MultiTokenAuth\Models\ApiToken`.
 
-To further validate if a user can access the API, you can override the <code>canAccessApi()</code> method available from the <code>HasMultipleApiTokens</code> trait.
+To further validate if a user can access the API, you can override the `canAccessApi()` method available from the `HasMultipleApiTokens` trait.
 
 For example, if you would like to restrict access to your API to allow only users with certain roles:
-    
-    class User extends Model {
-        .
-        .
-        .
-        public function canAccessApi(): bool
-        {
-            return $this->hasRole(['consumer', 'vendor']);
-        }
+```
+class User extends Model {
+    .
+    .
+    .
+    public function canAccessApi(): bool
+    {
+        return $this->hasRole(['consumer', 'vendor']);
     }
+}
+```
 
-<h2>Token Expiration</h2>
+# Token Expiration
 
-To enable token expiration, add the <code>\Landman\MultiTokenAuth\Http\Middleware\VerifyApiTokenExpired</code> middleware to the <code>$middlewareGroup['api']</code> array in the App\Http\Kernel file. 
-
-    protected $middlewareGroups = [
-        .
-        .
-        .
-        'api' => [
-            'throttle:60,1',
-            'bindings',
-            VerifyApiTokenExpired::class,
-        ],
-    ];
+To enable token expiration, add the `\Landman\MultiTokenAuth\Http\Middleware\VerifyApiTokenExpired` middleware to the `$middlewareGroup['api']` array in the App\Http\Kernel file. 
+```
+protected $middlewareGroups = [
+    .
+    .
+    .
+    'api' => [
+        'throttle:60,1',
+        'bindings',
+        VerifyApiTokenExpired::class,
+    ],
+];
+```
     
-Please note that the 'api' middleware must be applied in the <code>route_middleware</code> config value (See the configuration section below - this is set as default).
+Please note that the 'api' middleware must be applied in the `route_middleware` config value (See the [configuration](#configuration) section below - this is set as default).
 
-<h2>Configuration</h2>
+# Configuration
 
 Please see comments in https://gitlab.com/neilllandman/laravel-multitoken-auth/blob/master/config/multipletokens.php for more information. 
 
-Publish config/multipletokens.php.
-<br><code>php artisan vendor:publish</code>
+Publish config/multipletokens.php: `php artisan vendor:publish`
 
-<h4>Available configuration options</h4>
+### Available options
 <table>
 <thead><tr><th>Name</th><th>Description</th><th>Default</th><tr></thead>
 <tbody>
@@ -348,7 +364,7 @@ false
 
 </table>
 
-<h2>Events</h2>
+# Events
 To hook into the login and register functions, add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
 
     class User extends Model {
@@ -391,6 +407,7 @@ Example:
         }
     }
  
-In addition, the default Laravel <code>\Illuminate\Auth\Events\Login</code>, <code>\Illuminate\Auth\Events\Logout</code> and <code>\Illuminate\Auth\Events\Registered </code>events get fired.
+In addition, the default Laravel `\Illuminate\Auth\Events\Login`, `\Illuminate\Auth\Events\Logout` and `\Illuminate\Auth\Events\Registered` events get fired.
 
-The package also listens to the <code>\Illuminate\Auth\Events\PasswordReset</code> event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see <code>invalidateAllTokens</code> under Models).
+The package also listens to the `\Illuminate\Auth\Events\PasswordReset` event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see `invalidateAllTokens` under [Models](#models)).
+
