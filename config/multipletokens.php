@@ -60,14 +60,16 @@ return [
 
 
     /*
-     * Route mappings. If you would like to change the default route paths, you can do that here.
+     * Route configurations.
      */
+
+    /* Middleware applied to all routes. */
     'route_middleware' => ['api'],
 
     /* Prefix for all routes */
     'route_prefix' => 'api',
 
-    /* Mappings */
+    /* Mappings. If you would like to change the default route paths, you can do that here. */
     'route_mappings' => [
         'login' => '/auth/login',
         'register' => '/auth/register',
@@ -75,25 +77,19 @@ return [
         'devices' => '/user/api-devices',
         'logout' => '/auth/logout',
         'logout-all' => '/auth/logout-all',
-        'token-refresh' => 'token/refresh',
         'password-email' => 'password/email',
         'password-reset' => 'password/reset',
         'password-update' => 'password/update',
     ],
 
     /*
-     * Whether or not the api tokens should expire.
+     * Token expiry configuration.
      */
-    'tokens_expire' => true,
 
     /*
      * How long it takes for a token to expire. Tokens get refreshed everytime they are used. Hence, a
-     * lifetime of 14400 minutes will cause the token to expire if it hasn't been used for 10 days
+     * lifetime of 14400 minutes will cause the token to expire if it hasn't been used for 10 days.
+     * A value of 0 will disable expiration.
      */
-    'token_lifetime' => 14400,
-
-    /*
-     * Events
-     */
-    'model_is_listening' => false,
+    'token_lifetime' => env('TOKEN_LIFETIME', 14400),
 ];

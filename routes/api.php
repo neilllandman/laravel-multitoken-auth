@@ -14,13 +14,11 @@ Route::group([], function () use ($mappings) {
 
             Route::post($mappings['logout'], 'ApiAuthController@logout');
             Route::post($mappings['logout-all'], 'ApiAuthController@logoutAll');
-            Route::post($mappings['token-refresh'], 'ApiAuthController@refreshToken');
 
             Route::get($mappings['user'], 'ApiAuthController@user');
             Route::post($mappings['password-update'], 'ApiAuthController@updatePassword');
         });
 
         Route::post($mappings['password-email'], 'ApiAuthController@sendResetLinkEmail');
-        Route::post($mappings['password-reset'], 'ApiAuthController@reset');
     });
 });

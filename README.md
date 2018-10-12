@@ -70,14 +70,68 @@ Refresh a Client (this will reset the 'Api Client ID' value):
 Some routes are provided by default. Authenticated routes require an Authorization header with a valid token.
 <table>
 <thead>
-<tr><th>Method</th><th>URI</th><th>Authentication Required</th></tr>
+<tr><th>Method</th><th>URI</th><th>Description</th><th>Authenticated</th><th>Params</th></tr>
 </thead>
 <tbody>
-<tr><td>POST</td><td>/api/auth/login</td><td>No</td>
-<tr><td>POST</td><td>/api/auth/register</td><td>No</td>
-<tr><td>POST</td><td>/api/auth/logout</td><td>Yes</td></tr>
-<tr><td>POST</td><td>/api/auth/logout-all</td><td>Yes</td></tr>
-<tr><td>GET|HEAD</td><td>/api/auth/user</td><td>Yes</td></tr>
+<tr>
+<td>POST</td>
+<td>/api/auth/login</td>
+<td>Login a user.</td>
+<td>No</td>
+<td>*See config</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/auth/register</td>
+<td>Register a user.</td>
+<td>No</td>
+<td>*See config</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/auth/logout</td>
+<td>Logout a user and invalidated the current token.</td>
+<td>Yes</td>
+<td>None</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/auth/logout-all</td>
+<td>Logout a user and invalidated all tokens from all devices.</td>
+<td>Yes</td>
+<td>None</td>
+</tr>
+<tr>
+<td>GET|HEAD</td>
+<td>/api/auth/user</td>
+<td>Get the current user's data.</td>
+<td>Yes</td>
+<td>None</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/password/reset</td>
+<td>Send a password reset link via email.</td>
+<td>Yes</td>
+<td>
+
+    email    
+</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/password/update</td>
+<td>Update a user's password.</td>
+<td>Yes</td>
+<td>
+
+    
+    password
+    password_confirmation
+    current_password
+        
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -90,7 +144,7 @@ with params:
 
 
     {
-        "client_id": "id created via php artisan",
+        "client_id": "Api Client ID created via php artisan",
         "email": "email",
         "password": "pw"
     }
@@ -172,38 +226,38 @@ Publish config/multipletokens.php.
 <td>email</td>
 </tr>
 <tr>
-<td>tables</td>
-<td>The names of the tables created when running the migrations.</td>
-<td>
-
-    [
-        'clients' => 'api_clients',
-        'tokens' => 'api_tokens'
-    ]
-</td>
+<td>table_clients</td>
+<td>The name of the clients table created when running the migrations.</td>
+<td>api_clients</td>
 </tr>
 <tr>
-<td>login.validation</td>
+<td>table_tokens</td>
+<td>The name of the tokens table created when running the migrations.</td>
+<td>api_tokens</td>
+</tr>
+<tr>
+<td>login_validation</td>
 <td>Validation rules to use upon login. Note that client_id is always validated.</td>
 <td>
 
     [
         'email' => 'required|email|string',
         'password' => 'required|string',
+        'device' => 'sometimes|string',
     ]
 </td>
 </tr>
 <tr>
-<td>register.fields</td>
+<td>register_fields</td>
 <td>The fields that will be passed to the create method of the given Eloquent model. Note that if the password field is present it will be encrypted using bcrypt().</td>
 <td>
 
-    ['name','email','password'],
+    // ['name','email','password'],
 </td>
 </tr>
 
 <tr>
-<td>register.usefillable</td>
+<td>register_usefillable</td>
 <td>Use the fillable array specified on the User model.</td>
 <td>
 false
@@ -211,7 +265,7 @@ false
 </tr>
 
 <tr>
-<td>register.validation</td>
+<td>register_validation</td>
 <td>Validation rules to use upon registration. If the 'fields' array above is not given, the keys for this array will be used.</td>
 <td>
     
@@ -219,38 +273,58 @@ false
         'name' => 'required|string|min:2',
         'email' => 'required|email|string|unique:users',
         'password' => 'required|string|min:12|confirmed',
+        'device' => 'sometimes|string',
     ]
 </td>
 </tr>
 
 <tr>
-<td>routes</td>
-<td>Route mappings. If you would like to change the default route paths, you can do that here.</td>
+<td>route_middleware</td>
+<td>Middleware applied to all routes.</td>
 <td>
     
+    ['api']
+</td>
+</tr>
+<tr>
+<td>route_prefix</td>
+<td>Prefix for all routes.</td>
+<td>
+    
+    'api'
+</td>
+</tr>
+
+<tr>
+<td>route_mappings</td>
+<td>Route mappings. If you would like to change the default route paths, you can do that here.</td>
+<td>
+        
     [
-        'middleware' => ['api'],
-        'prefix' => 'api',
-        'mappings' => [
-            'login' => '/auth/login',
-            'register' => '/auth/register',
-            'user' => '/auth/user',
-            'logout' => '/auth/logout',
-            'logout-all' => '/auth/logout-all',
-            'token-refresh' => 'token/refresh',
-        ],
+        'login' => '/auth/login',
+        'register' => '/auth/register',
+        'user' => '/auth/user',
+        'devices' => '/user/api-devices',
+        'logout' => '/auth/logout',
+        'logout-all' => '/auth/logout-all',
+        'password-email' => 'password/email',
+        'password-update' => 'password/update',
     ]
 </td>
 </tr>
 <tr>
-<td>model-is-listening</td>
-<td>Specifies whether the model event functions should be fired. (Refer to Events)</td>
-<td>false</td>
+<td>token_lifetime</td>
+<td>How long it takes for a token to expire. Tokens get refreshed everytime they are used.</td>
+<td>
+    
+    14400
+</td>
 </tr>
+
 </table>
 
 <h2>Events</h2>
-To hook into the login and register functions, you should publish the configuration files and set the 'model-is-listening' option to true and add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
+To hook into the login and register functions, add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
 
     class User extends Model {
         use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
@@ -267,7 +341,7 @@ This trait exposes the following methods, all of which receives the current requ
 <tbody>
 <tr><td><code>beforeApiRegistered</code></td><td>Runs before the model is saved. (You can save the user inside the method as well).</td><tr>
 <tr><td><code>afterApiRegistered</code></td><td>Runs after successful registeration.</td><tr>
-<tr><td><code>afterApiLogin</code></td><td>Runs after successful login.</td><tr>
+<tr><td><code>afterApiLogin</code></td><td>Runs after successful login. This method also gets fired after <code>afterApiRegistered</code></td><tr>
 <tr><td><code>afterApiLogout</code></td><td>Runs after successful logout.</td><tr>
 </tbody>
 </table>

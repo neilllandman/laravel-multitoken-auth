@@ -53,14 +53,15 @@ class ApiToken extends Model
      */
     public function scopeInvalid($query)
     {
-        return $query->withTrashed()
-            ->where(function ($query) {
-                return $query->where('remember', false)
-                    ->where('updated_at', '<=', now()->addMonth());
-            })->orWhere(function ($query) {
-                return $query->where('remember', true)
-                    ->where('expires_at', '<=', now());
-            })->orWhereNull('deleted_at');
+        return $query->where('expires_at', '<', now());
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function cleanInvalid()
+    {
+        return ApiToken::invalid()->delete();
     }
 
 
@@ -70,32 +71,13 @@ class ApiToken extends Model
     public static function boot()
     {
         parent::boot();
+
         static::creating(function (ApiToken $token) {
-            $token->setFreshFields();
+            $this->token = $this->generateToken();
+            $this->refresh_token = $this->generateToken();
+            $this->expires_at = $this->generateExpiresAtDate();
             return true;
         });
-    }
-
-
-    /**
-     * @return $this
-     */
-    public function refresh()
-    {
-        $this->restore();
-        $this->setFreshFields()->save();
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    private function setFreshFields()
-    {
-        $this->token = $this->generateToken();
-        $this->refresh_token = $this->generateToken();
-        $this->expires_at = $this->generateExpiresAtDate();
-        return $this;
     }
 
     /**
@@ -161,15 +143,6 @@ class ApiToken extends Model
         return Crypt::encrypt($value);
     }
 
-    /**
-     * @param $field
-     * @param $value
-     * @return bool
-     */
-    public function equalsEncryptedAttribute($field, $value)
-    {
-        return $this->getAttribute($field) === $value;
-    }
 
     /**
      * @param $value
@@ -183,33 +156,9 @@ class ApiToken extends Model
     /**
      * @return bool
      */
-    public function getShouldForgetAttribute(): bool
-    {
-        return !$this->should_remember;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getShouldRememberAttribute(): bool
-    {
-        return $this->remember === true && !config('auth.api_tokens_expire', false);
-    }
-
-    /**
-     * @return \Carbon\Carbon
-     */
-    public function getRememberExpiryTime(): Carbon
-    {
-        return $this->updated_at->copy()->addMonth();
-    }
-
-    /**
-     * @return bool
-     */
     public function shouldBeInvalidated(): bool
     {
-        return now()->gte($this->remember ? $this->getRememberExpiryTime() : $this->expires_at);
+        return Config::get('multitoken.token_lifetime') > 0 && now()->gte($this->expires_at);
     }
 
     /**

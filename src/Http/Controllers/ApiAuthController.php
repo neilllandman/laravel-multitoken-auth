@@ -172,15 +172,25 @@ class ApiAuthController extends Controller
 
         $this->validate($request, [
             'password' => 'required|string|min:8|confirmed',
+            'current_password' => 'required|string'
         ]);
 
         try {
             DB::beginTransaction();
-            $user->update([
-                'password' => bcrypt($request->password)
-            ]);
-            DB::commit();
-            return response()->json(['message' => trans('Your password has been updated.')]);
+            $userNameField = $this->config['username'];
+            $credentials = [
+                "{$userNameField}" => $user->{$userNameField},
+                'password' => $request->input('current_password'),
+            ];
+            if ($this->guard->hasValidCredentials($user, $credentials)) {
+                $user->update([
+                    'password' => bcrypt($request->password)
+                ]);
+                DB::commit();
+                return response()->json(['message' => trans('Your password has been updated.')]);
+            } else {
+                return response()->json(['message' => trans('auth.failed')], 401);
+            }
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getTraceAsString());
@@ -298,9 +308,9 @@ class ApiAuthController extends Controller
      * @param $eventName
      * @return bool
      */
-    private function handleEvent(Request $request, $user, $eventName)
+    private function handleEvent(Request $request, $user, string $eventName)
     {
-        if ($this->shouldFireEvents) {
+        if (method_exists($user, $eventName)) {
             $user = $user->{$eventName}($request);
         }
         return $user;
