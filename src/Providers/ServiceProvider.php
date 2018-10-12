@@ -81,6 +81,8 @@ class ServiceProvider extends SupportServiceProvider
             __DIR__ . '/../../config/multipletokens.php', 'multipletokens'
         );
 
+        $this->app->register(EventServiceProvider::class);
+
 //        Auth::resolveUsersUsing(function ($guard = null) {
 //            return Auth::user() ? Auth::user() : Auth::guard('api')->user();
 //        });

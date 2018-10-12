@@ -120,6 +120,10 @@ class ApiAuthController extends Controller
             $this->handleEvent($request, $user, 'afterApiRegistered');
 
 
+            if (class_exists("\\Illuminate\\Auth\\Events\\Registered"))
+                event(new \Illuminate\Auth\Events\Registered($user));
+
+
             $this->guard->attempt($request->only([$this->config['username'], 'password']), $request);
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
             DB::commit();
