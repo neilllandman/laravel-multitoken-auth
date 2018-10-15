@@ -233,11 +233,15 @@ Response example:
 
 
 # Models
+
+#### Working with API tokens
 The user's api tokens can be retrieved via the `$user->apiTokens()` relationship.
 
 You can invalidate all api tokens for a user by calling `$user->invalidateAllTokens()`.
 
 To manually issue an ApiToken to a user, the `$user->issueToken()` method can be used. This method returns an instance of `\Landman\MultiTokenAuth\Models\ApiToken`.
+
+#### Further validation
 
 To further validate if a user can access the API, you can override the `canAccessApi()` method available from the `HasMultipleApiTokens` trait.
 
@@ -272,7 +276,7 @@ class User extends Model {
     }
 }
 ```
-
+By default, the model itself is returned.
 
 # Token Expiration
 
@@ -455,7 +459,7 @@ Example:
         }
     }
  
-### Via Listeners
+### Via Event Listeners
 If you would like to register your own listeners, you can attach them to the following events
  
 <table>
@@ -481,7 +485,7 @@ Each of these events expose the following properties:
 <tbody>
 <tr><td>$guard</td><td>The authentication guard</td></tr>
 <tr><td>$user</td><td>The user that is currently being authenticated or is authenticated.</td></tr>
-<tr><td>$token</td><td>The ApiToken used for authentication. Note that he token will be null for the ApiAuthenticating event.</td></tr>
+<tr><td>$token</td><td>The ApiToken used for authentication. Note that the token will be null for the ApiAuthenticating event.</td></tr>
 </tbody>
 </table>
 
@@ -540,7 +544,58 @@ The `Landman\MultiTokenAuth\Classes\TokenApp` class provides some static functio
 
 ### Accessing the authentication guard.
 
-The authentication guard can be accessed via the `TokenApp::guard()` method.
+The authentication guard can be accessed via the normal Laravel `Auth` facade as `Auth::guard('api')` or via the (recommended) 
+`TokenApp::guard()` method.
+
+# Manual Registration and Login
+
+If you prefer or need to write your own controller methods for login and registration, comment out the relevant routes in the configuration file.
+You can use the provided guard to log the user in, automatically create a token and return a consistent response.
+
+
+```
+public function login(Request $request){
+    $this->validate($request, [
+        'email' => 'required|email',
+        'password' => 'required|string'
+    ]);
+    $user = User::where('email', $request->input('email'))->first();
+    
+    $guard = TokenApp::guard();
+    if($user && $guard->attempt($request->only(['email', 'password'])){
+        return $guard->authenticatedResponse();
+        // or access the api token and user via $guard->token() and $guard->user() to build your own response.
+    }else{
+        throw new AuthenticationException();
+    }
+}
+
+public function login(Request $request){
+    $this->validate($request, [
+        'email' => 'required|email',
+        'password' => 'required|string',
+        .
+        .
+        .
+    ]);
+    ...
+    $user = User::create($userData); 
+    $guard = TokenApp::guard();
+    $guard->login($user); // We know the user exists so there is no need to validate credentials via the attempt method
+    return $guard->authenticatedResponse();
+}
+```
+
+The `authenticatedResponse` method accepts one boolean parameter indicating whether a fresh user instance should be 
+retrieved from the database and returns and instance of `\Illuminate\Http\JsonResponse` with structure
+```
+ {
+    "user": [as defined in $user->toApiFormat()],
+    "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
+ } 
+```
+ 
+An `AuthenticationException` is thrown if the user is not authenticated via the `login` or `attempt` methods.
 
 # Testing
 
