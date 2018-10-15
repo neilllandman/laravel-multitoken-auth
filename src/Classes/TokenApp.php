@@ -26,10 +26,19 @@ class TokenApp
 
 //    public static $config;
 
+    /**
+     *
+     */
     const CONFIG_SPACE = 'multipletokens';
 
+    /**
+     * @var bool
+     */
     public static $shouldFireEvents = false;
 
+    /**
+     *
+     */
     public function boot()
     {
         self::$shouldFireEvents = true;
@@ -142,6 +151,16 @@ class TokenApp
     public static function makeUserModel()
     {
         return app()->make(self::config('model'));
+    }
+
+    /**
+     * @param $routeName
+     * @return mixed
+     */
+    public static function routeUri($routeName)
+    {
+        $route = self::config('route_prefix') . "/" . self::config('route_mappings.' . $routeName);
+        return str_replace('//', '/', $route);
     }
 
     /**

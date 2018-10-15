@@ -13,6 +13,13 @@ return [
      */
     'username' => 'email',
 
+
+    /*
+     * Eloquent model username column. This column will be used for
+     * authentication on login.
+     */
+    'password_field' => 'password',
+
     /*
      * The names of the tables created when running the migrations.
      */
