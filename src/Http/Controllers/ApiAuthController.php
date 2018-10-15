@@ -56,6 +56,7 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\AuthenticationException
      * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
@@ -69,7 +70,7 @@ class ApiAuthController extends Controller
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
-            return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
+            return $this->authenticationSuccessful();
         }
 
         return response()->json([
@@ -131,13 +132,11 @@ class ApiAuthController extends Controller
             $user->save();
             $this->handleEvent($request, $user, 'afterApiRegistered');
 
-
-            $this->guard->login($user, $request);
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
+            $this->guard->login($user);
             DB::commit();
-
-            return $this->authenticationSuccessful($this->guard->user(), $this->guard->token());
+            return $this->authenticationSuccessful();
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -159,19 +158,12 @@ class ApiAuthController extends Controller
      * Build response for successful login, registration and token refresh
      *
      * @param $user
-     * @param ApiToken $apiToken
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Auth\AuthenticationException
      */
-    private function authenticationSuccessful(Authenticatable $user, ApiToken $apiToken)
+    private function authenticationSuccessful()
     {
-        $user = $user->toApiFormat();
-
-        $token = $apiToken->token;
-        if ($apiToken->expires_at !== null && !$apiToken->should_forget) {
-//            $refresh_token = $apiToken->refresh_token;
-            $expires_at = $apiToken->expires_at->toDateTimeString();
-        }
-        return response()->json(compact('user', 'token', 'refresh_token', 'expires_at'));
+        return $this->guard->authenticatedResponse();
     }
 
     /**

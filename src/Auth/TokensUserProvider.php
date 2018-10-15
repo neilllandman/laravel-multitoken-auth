@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 
 /**
  * Created by PhpStorm.
@@ -103,6 +104,9 @@ class TokensUserProvider implements UserProvider
             // Eloquent User "model" that will be utilized by the Guard instances.
             $query = $this->createModel()->newQuery();
 
+            $query->where(TokenApp::config('username'), $credentials[TokenApp::config('username')]);
+
+            return $query->first();
             foreach ($credentials as $key => $value) {
                 if (!Str::contains($key, 'password')) {
                     $query->where($key, $value);
@@ -122,8 +126,8 @@ class TokensUserProvider implements UserProvider
     /**
      * Validate a user against the given credentials.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
+     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param  array $credentials
      * @return bool
      */
     public function validateCredentials(Authenticatable $user, array $credentials)

@@ -20,7 +20,6 @@ use Landman\MultiTokenAuth\Classes\TokenApp;
  * Date: 2018/03/07
  * Time: 08:27
  *
- * @method user()
  */
 class TokensGuard extends TokenGuard
 {
@@ -78,10 +77,12 @@ class TokensGuard extends TokenGuard
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @param Request $request
      */
-    public function login(Authenticatable $user, Request $request)
+    public function login(Authenticatable $user, Request $request = null)
     {
-        $user_agent = $request->header('user-agent') ?? 'Unknown';
-        $device = $request->input('device') ?? 'Unknown';
+        if ($request) {
+            $user_agent = $request->header('user-agent') ?? 'Unknown';
+            $device = $request->input('device') ?? 'Unknown';
+        }
 
         $token = new ApiToken(compact('user_agent', 'device'));
         $token->setExpiresAt();
@@ -165,6 +166,33 @@ class TokensGuard extends TokenGuard
         return $check;
     }
 
+
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function user()
+    {
+        // If we've already retrieved the user for the current request we can just
+        // return it back immediately. We do not want to fetch the user data on
+        // every call to this method because that would be tremendously slow.
+        if (!is_null($this->user)) {
+            return $this->user;
+        }
+        $user = null;
+
+        $token = $this->getTokenForRequest();
+
+        if (!empty($token)) {
+            $user = $this->provider->retrieveByCredentials(
+                [$this->storageKey => $token]
+            );
+        }
+
+        return $this->user = $user;
+    }
+
     /**
      * @return ApiToken
      */
@@ -186,5 +214,27 @@ class TokensGuard extends TokenGuard
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+    /**
+     * @param bool $refreshUser
+     * @return \Illuminate\Http\JsonResponse|null
+     * @throws AuthenticationException
+     */
+    public function authenticatedResponse(bool $refreshUser = false)
+    {
+        if ($this->check()) {
+            $user = $this->user();
+            if ($refreshUser) {
+                $this->setUser($user->fresh());
+            }
+            $user = $this->user();
+            return response()->json([
+                'user' => $user->toApiFormat(),
+                'token' => $this->token()->token,
+//                'expires_at' => $this->token()->expires_at,
+            ]);
+        }
+        throw new AuthenticationException();
     }
 }
