@@ -570,7 +570,7 @@ public function login(Request $request){
     }
 }
 
-public function login(Request $request){
+public function register(Request $request){
     $this->validate($request, [
         'email' => 'required|email',
         'password' => 'required|string',
