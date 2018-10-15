@@ -87,5 +87,4 @@ class ExampleTest extends TestCase
         $response->assertJsonStructure([$usernameField]);
         $this->assertEquals($responseData[$usernameField], $user->{$usernameField});
     }
-
 }

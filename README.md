@@ -111,7 +111,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 </tr>
 <tr>
 <td>POST</td>
-<td>/api/auth/logout-all</td>
+<td>/api/auth/logout_all</td>
 <td>Logout a user from all their devices and invalidates all tokens.</td>
 <td>Yes</td>
 <td>None</td>
@@ -347,9 +347,9 @@ false
         'user' => '/auth/user',
         'devices' => '/auth/user/api-devices',
         'logout' => '/auth/logout',
-        'logout-all' => '/auth/logout-all',
-        'password-email' => 'password/email',
-        'password-update' => 'password/update',
+        'logout_all' => '/auth/logout-all',
+        'password_email' => 'password/email',
+        'password_update' => 'password/update',
     ]
 </td>
 </tr>

@@ -29,6 +29,7 @@ trait HasUuidKey
      * The UUID is timestamped for incrementing order.
      *
      * @return string
+     * @throws \Exception
      */
     public function generateNewId(): string
     {
@@ -55,7 +56,10 @@ trait HasUuidKey
         return "{$prefix}{$uuid}";
     }
 
-    public static function newId()
+    /**
+     * @return string
+     */
+    public static function newId(): string
     {
         return (new static)->generateNewId();
     }

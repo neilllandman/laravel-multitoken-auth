@@ -15,7 +15,7 @@ return [
 
 
     /*
-     * Eloquent model username column. This column will be used for
+     * Eloquent model password column. This column will be used for
      * authentication on login.
      */
     'password_field' => 'password',
@@ -66,10 +66,10 @@ return [
     ],
 
     /*
-     * Whether or not to send an email verification mail to the user.
+     * Whether or not to send an email verification mail to the user on registration.
      * Refer to https://laravel.com/docs/5.7/verification.
      */
-    'send_verification_email' => true,
+    'send_verification_email' => false,
 
 
     /*
@@ -82,16 +82,19 @@ return [
     /* Prefix for all routes */
     'route_prefix' => 'api',
 
-    /* Mappings. If you would like to change the default route paths, you can do that here. */
+    /*
+     * Mappings. If you would like to change the default route paths, you can do that here. If you
+     * would like to disable any of these routes, you can comment them out individually.
+     */
     'route_mappings' => [
         'login' => '/auth/login',
         'register' => '/auth/register',
         'user' => '/auth/user',
         'devices' => '/auth/user/api-devices',
         'logout' => '/auth/logout',
-        'logout-all' => '/auth/logout-all',
-        'password-email' => 'password/email',
-        'password-update' => 'password/update',
+        'logout_all' => '/auth/logout-all',
+        'password_email' => 'password/email',
+        'password_update' => 'password/update',
     ],
 
     /*

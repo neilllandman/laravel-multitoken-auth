@@ -2,6 +2,7 @@
 
 namespace Landman\MultiTokenAuth\Http\Controllers;
 
+use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Password;
@@ -275,10 +276,19 @@ class ApiAuthController extends Controller
     public function sendResetLinkEmail(Request $request)
     {
         $this->validate($request, [
+            'client_id' => 'required',
             'email' => 'required|email',
         ]);
 
-        if ($this->user->where('email', $request->input('email'))->count() === 0) {
+        TokenApp::validateClientId($request->input('client_id'));
+
+        $username = TokenApp::config('username');
+        $user = User::where([
+            $username => $request->input($username),
+        ])->first();
+
+
+        if (!$user) {
             return response()->json([
                 'message' => 'We can\'t find a user with that e-mail address.'
             ], 422);
@@ -288,16 +298,22 @@ class ApiAuthController extends Controller
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
         // TODO: Use $user->sendPasswordResetNotification(Password::broker()->createToken());
-        $broker = Password::broker();
-        $response = $broker->sendResetLink(
-            $request->only('email')
-        );
 
-        return $response == Password::RESET_LINK_SENT
-            ? response()->json([
+
+        try {
+            DB::beginTransaction();
+            $resetToken = Password::createToken($user);
+            $user->sendPasswordResetNotification($resetToken);
+
+            DB::commit();
+            return response()->json([
                 'message' => trans('passwords.sent')
-            ])
-            : response()->json(['message' => ''], 500);
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => ''], 500);
+        }
     }
 
     /**
