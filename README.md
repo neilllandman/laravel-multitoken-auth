@@ -477,3 +477,7 @@ class UpdateUserLastLogin
 
 The package also listens to the `\Illuminate\Auth\Events\PasswordReset` event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see `invalidateAllTokens` under [Models](#models)).
 
+# Accessing the authentication guard.
+
+The authentication guard can be accessed via the TokenApp::guard() method.
+See https://gitlab.com/neilllandman/laravel-multitoken-auth/blob/master/src/Classes/TokenApp.php
