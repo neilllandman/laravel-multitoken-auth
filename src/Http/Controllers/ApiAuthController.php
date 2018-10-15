@@ -70,7 +70,7 @@ class ApiAuthController extends Controller
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
 
-            return $this->authenticationSuccessful();
+            return $this->guard->authenticatedResponse();
         }
 
         return response()->json([
@@ -132,11 +132,11 @@ class ApiAuthController extends Controller
             $user->save();
             $this->handleEvent($request, $user, 'afterApiRegistered');
 
-            $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
-
             $this->guard->login($user);
+
             DB::commit();
-            return $this->authenticationSuccessful();
+            TokenApp::fireRegisterEvent($this->guard);
+            return $this->guard->authenticatedResponse();
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -155,18 +155,6 @@ class ApiAuthController extends Controller
     }
 
     /**
-     * Build response for successful login, registration and token refresh
-     *
-     * @param $user
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Auth\AuthenticationException
-     */
-    private function authenticationSuccessful()
-    {
-        return $this->guard->authenticatedResponse();
-    }
-
-    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
@@ -182,9 +170,10 @@ class ApiAuthController extends Controller
 
         try {
             DB::beginTransaction();
-            $userNameField = $this->config['username'];
+            $usernameField = $this->config['username'];
+            $passwordField = $this->config['password_field'];
             $credentials = [
-                "{$userNameField}" => $user->{$userNameField},
+                "{$usernameField}" => $user->{$usernameField},
                 'password' => $request->input('current_password'),
             ];
             if ($this->guard->getProvider()->validateCredentials($user, $credentials)) {

@@ -49,7 +49,6 @@ class EventServiceProvider extends ServiceProvider
         });
 
         Event::listen(ApiAuthenticating::class, function (ApiAuthenticating $event) {
-            logger('ApiAuthenticating');
             if (ApiToken::shouldExpire()) {
                 $token = $event->guard->token();
                 if ($token) {
@@ -62,27 +61,22 @@ class EventServiceProvider extends ServiceProvider
         });
 
         Event::listen(ApiAuthenticated::class, function (ApiAuthenticated $event) {
-            logger('ApiAuthenticated');
             $event->guard->token()->updateExpiresAt();
         });
 
         Event::listen(ApiLogin::class, function (ApiLogin $event) {
-            logger('ApiLogin');
         });
 
         Event::listen(ApiLogout::class, function (ApiLogout $event) {
-            logger('ApiLogout');
         });
 
 
         Event::listen(ApiRegistered::class, function (ApiRegistered $event) {
-            dd($event->user);
             if (Config::get('multipletokens.send_verification_email')) {
                 if ($event->user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$event->user->hasVerifiedEmail()) {
                     $event->user->sendEmailVerificationNotification();
                 }
             }
-            logger('ApiRegistered');
         });
 
         parent::boot();

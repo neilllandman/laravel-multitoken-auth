@@ -13,8 +13,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Events\ApiAuthenticated;
+use Landman\MultiTokenAuth\Events\ApiAuthenticating;
 use Landman\MultiTokenAuth\Events\ApiLogin;
 use Landman\MultiTokenAuth\Events\ApiLogout;
+use Landman\MultiTokenAuth\Events\ApiRegistered;
 use Landman\MultiTokenAuth\Models\ApiClient;
 use Landman\MultiTokenAuth\Models\ApiToken;
 
@@ -34,7 +36,7 @@ class TokenApp
     /**
      * @var bool
      */
-    public static $shouldFireEvents = false;
+    public static $shouldFireEvents = true;
 
     /**
      *
@@ -83,8 +85,7 @@ class TokenApp
      */
     public static function fireAuthenticatedEvent(TokensGuard $guard, $user)
     {
-        if (self::$shouldFireEvents === true && self::$authenticationFired === false) {
-            self::$authenticationFired = true;
+        if (self::$shouldFireEvents === true) {
 //            event(new \Illuminate\Auth\Events\Authenticated($guard, $user));
             event(new ApiAuthenticated($guard, $guard->user(), $guard->token()));
         }
@@ -125,11 +126,10 @@ class TokenApp
      * Fire the registered event.
      *
      * @param TokensGuard $guard
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @return void
      *
      */
-    public static function fireRegisterEvent(TokensGuard $guard, $user)
+    public static function fireRegisterEvent(TokensGuard $guard)
     {
         if (self::$shouldFireEvents === true) {
             //            event(new \Illuminate\Auth\Events\Registered($user));
