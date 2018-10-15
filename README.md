@@ -132,12 +132,13 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 </tr>
 <tr>
 <td>POST</td>
-<td>/api/password/reset</td>
+<td>/api/password/email</td>
 <td>Send a password reset link via email.</td>
-<td>Yes</td>
+<td>No</td>
 <td>
 
-    email    
+    email
+    client_id 
 </td>
 </tr>
 <tr>
@@ -251,6 +252,11 @@ Publish config/multipletokens.php: `php artisan vendor:publish`
 <td>username</td>
 <td>Eloquent model username column. This column will be used for authentication on login.</td>
 <td>email</td>
+</tr>
+<tr>
+<td>password_field</td>
+<td>Eloquent model password column. This column will be used for authentication on login.</td>
+<td>password</td>
 </tr>
 <tr>
 <td>table_clients</td>
@@ -417,7 +423,56 @@ If you would like to register your own listeners, you can attach them to the fol
 <tr><td>Landman\MultiTokenAuth\Events\ApiLogout</td></tr>
 <tr><td>Landman\MultiTokenAuth\Events\ApiRegistered</td></tr>
 </tbody>
-</table>        
+</table>
+
+Each of these events expose the following properties:
+
+ 
+<table>
+<thead>
+<tr><th>Property</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td>$guard</td><td>The authentication guard</td></tr>
+<tr><td>$user</td><td>The user that is currently being authenticated or is authenticated.</td></tr>
+<tr><td>$token</td><td>The ApiToken used for authentication. Note that he token will be null for the ApiAuthenticating event.</td></tr>
+</tbody>
+</table>
+
+Example 
+```
+<?php
+
+namespace App\Listeners;
+use Landman\MultiTokenAuth\Events\ApiLogin;
+class UpdateUserLastLogin
+{
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param  Landman\MultiTokenAuth\Events\ApiLogin  $event
+     * @return void
+     */
+    public function handle(ApiLogin $event)
+    {
+        $guard = $event->guard;
+        $user = $event->user;
+        $token = $event->token;
+
+        $user->update(['last_login_at' => now()]);
+    }
+}
+```
 
 
 The package also listens to the `\Illuminate\Auth\Events\PasswordReset` event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see `invalidateAllTokens` under [Models](#models)).
