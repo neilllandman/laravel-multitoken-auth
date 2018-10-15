@@ -12,6 +12,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 use Landman\MultiTokenAuth\Events\ApiAuthenticated;
 use Landman\MultiTokenAuth\Events\ApiAuthenticating;
 use Landman\MultiTokenAuth\Events\ApiLogin;
@@ -52,7 +53,7 @@ class EventServiceProvider extends ServiceProvider
             if (ApiToken::shouldExpire()) {
                 $token = $event->guard->token();
                 if ($token) {
-                    if ($token->expires_at !== null && $token->expires_at->lt(now())) {
+                    if ($token->hasExpired()) {
                         $token->invalidate();
                         throw new AuthenticationException("Unauthenticated - your token has expired and has been invalidated.");
                     }
@@ -72,7 +73,7 @@ class EventServiceProvider extends ServiceProvider
 
 
         Event::listen(ApiRegistered::class, function (ApiRegistered $event) {
-            if (Config::get('multipletokens.send_verification_email')) {
+            if (TokenApp::config('send_verification_email')) {
                 if ($event->user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$event->user->hasVerifiedEmail()) {
                     $event->user->sendEmailVerificationNotification();
                 }

@@ -5,6 +5,7 @@ namespace Landman\MultiTokenAuth\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Config;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 use Landman\MultiTokenAuth\Traits\HasUuidKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
@@ -12,6 +13,18 @@ use Illuminate\Support\Facades\Crypt;
 /**
  * Class ApiToken
  * @package App
+ *
+ * @property string $id
+ * @property string $token
+ * @property string|null $refresh_token
+ * @property bool $remember
+ * @property string $user_agent
+ * @property string $device
+ *
+ * @property Carbon|string $expires_at
+ * @property Carbon|string $deleted_at
+ * @property Carbon|string $created_at
+ * @property Carbon|string $updated_at
  */
 class ApiToken extends Model
 {
@@ -168,7 +181,15 @@ class ApiToken extends Model
      */
     public function shouldBeInvalidated(): bool
     {
-        return Config::get('multitoken.token_lifetime') > 0 && now()->gte($this->expires_at);
+        return TokenApp::config('token_lifetime') > 0 && $this->hasExpired();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExpired(): bool
+    {
+        return $this->expires_at === null || now()->gte($this->expires_at);
     }
 
     /**
@@ -178,6 +199,15 @@ class ApiToken extends Model
     public function invalidate(): bool
     {
         return $this->delete();
+    }
+
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function expire(): bool
+    {
+        return $this->invalidate();
     }
 
     /**
@@ -199,21 +229,11 @@ class ApiToken extends Model
     }
 
     /**
-     * @return bool
-     * @throws \Exception
-     */
-    public function expire(): bool
-    {
-        return $this->delete();
-    }
-
-
-    /**
      * @return mixed|string
      */
     public function getTable()
     {
         parent::getTable();
-        return Config::get('multipletokens.table_tokens');
+        return TokenApp::config('table_tokens');
     }
 }

@@ -4,11 +4,18 @@ namespace Landman\MultiTokenAuth\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 use Landman\MultiTokenAuth\Traits\HasUuidKey;
 
 /**
  * Class ApiToken
  * @package App
+ *
+ * @property string $id
+ * @property string $name
+ * @property string $value
+ * @property Carbon|string $created_at
+ * @property Carbon|string $updated_at
  */
 class ApiClient extends Model
 {
@@ -49,6 +56,6 @@ class ApiClient extends Model
     public function getTable()
     {
         parent::getTable();
-        return Config::get('multipletokens.table_clients');
+        return TokenApp::config('table_clients');
     }
 }
