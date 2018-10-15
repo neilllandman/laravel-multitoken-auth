@@ -160,38 +160,41 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 
 # Usage [WIP]
 
-Login
-<br><code>/api/auth/login</code>
+### Login
+<br>`/api/auth/login`
 
 with params: 
 
-
-    {
-        "client_id": "Api Client ID created via php artisan",
-        "email": "email",
-        "password": "pw"
-    }
+```
+{
+    "client_id": "Api Client ID created via php artisan",
+    "email": "email",
+    "password": "pw"
+}
+```
 
 Response example: 
-    
-     {
-        "user": {
-            "id": 1,
-            "name": "Mrs. Jailyn Boehm",
-            "email": "zemlak.royce@example.org",
-            "email_verified_at": "2018-10-10 12:09:12",
-            "created_at": "2018-10-10 12:09:12",
-            "updated_at": "2018-10-10 12:09:12"
-            },
-        "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
-     }
+``` 
+ {
+    "user": {
+        "id": 1,
+        "name": "Mrs. Jailyn Boehm",
+        "email": "zemlak.royce@example.org",
+        "email_verified_at": "2018-10-10 12:09:12",
+        "created_at": "2018-10-10 12:09:12",
+        "updated_at": "2018-10-10 12:09:12"
+        },
+    "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
+ }
+```
     
 
-Call authenticated routes using returned token in bearer token authorization header
 
-Example: <code>/api/auth/user</code>
-<br>
-Authorization Header: <code>Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV</code>
+### Calling Authenticated routes
+
+Getting the current user by calling `/api/auth/user`:
+
+Authorization Header: `Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV`
 
 Response: 
 
@@ -204,6 +207,28 @@ Response:
         "updated_at": "2018-10-10 12:09:12"
      }
 
+
+### Password reset emails
+
+Password reset emails are sent using the `sendPasswordResetNotification` function defined on the User model.
+
+`/api/password/email`
+
+with params: 
+```
+{
+    "client_id": "Api Client ID created via php artisan",
+    "email": "email",
+}
+```
+
+Response example: 
+```
+    
+{
+    "message": "We have e-mailed your password reset link!"
+}
+``` 
 
 
 
@@ -313,9 +338,10 @@ false
 
 <tr>
 <td>send_verification_email</td>
-<td>Whether or not to send an email verification mail to the user upon registration. Refer to https://laravel.com/docs/5.7/verification</td>
+<td>Whether or not to send an email verification mail using the `sendEmailVerificationNotification` to the user upon registration. Refer to https://laravel.com/docs/5.7/verification</td>
 <td>false</td>
 </tr>
+
 
 
 
@@ -477,7 +503,33 @@ class UpdateUserLastLogin
 
 The package also listens to the `\Illuminate\Auth\Events\PasswordReset` event to invalidate all api tokens when changing the user's password. If you are not using the default Laravel password reset routes, you will have to do this manually (see `invalidateAllTokens` under [Models](#models)).
 
-# Accessing the authentication guard.
+# Helper functions
 
-The authentication guard can be accessed via the TokenApp::guard() method.
-See https://gitlab.com/neilllandman/laravel-multitoken-auth/blob/master/src/Classes/TokenApp.php
+The `Landman\MultiTokenAuth\Classes\TokenApp` class provides some static functions that might be useful. 
+
+(See https://gitlab.com/neilllandman/laravel-multitoken-auth/blob/master/src/Classes/TokenApp.php)
+
+
+### Creating clients
+
+`TokenApp::makeClient($name)`
+
+### Validating a client id
+
+`TokenApp::validateClientId(string $clientId)`
+
+### Accessing the authentication guard.
+
+The authentication guard can be accessed via the `TokenApp::guard()` method.
+
+# Testing
+
+### Test assumptions
+
+The tests assume that you have a factory defined for the specified user model class. See https://laravel.com/docs/5.7/database-testing#writing-factories for more information regarding factories.
+
+### Running tests
+You can run tests by running the following command in your project's base directory
+
+`vendor/bin/phpunit vendor/neilllandman/laravel-multitoken-auth/tests`
+

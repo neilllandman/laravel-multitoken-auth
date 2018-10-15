@@ -4,7 +4,9 @@ namespace Tests\Unit;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Classes\TokenApp;
+use Landman\MultiTokenAuth\Console\Commands\MakeApiClient;
 use Landman\MultiTokenAuth\Models\ApiClient;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Tests\TestCase;
@@ -34,6 +36,29 @@ class ExampleTest extends TestCase
     {
         $user = TokenApp::makeUserModel();
         $this->assertInstanceOf(TokenApp::getUserClass(), $user);
+    }
+
+    public function testGuardInstance()
+    {
+        $this->assertInstanceOf(TokensGuard::class, TokenApp::guard());
+    }
+
+    public function testMakeClient(){
+        $name = str_random(16);
+        $client = ApiClient::make($name);
+        $this->assertDatabaseHas(TokenApp::config('table_clients'), [
+            'name' => $name,
+            'id' => $client->id,
+            'value' => $client->value,
+        ]);
+    }
+
+    public function testValidateClientId()
+    {
+        $this->assertFalse(TokenApp::validateClientId(str_random()));
+        $client = ApiClient::make(str_random());
+
+        $this->assertTrue(TokenApp::validateClientId($client->value));
     }
 
     /**

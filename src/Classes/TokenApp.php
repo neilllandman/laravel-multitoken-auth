@@ -164,6 +164,15 @@ class TokenApp
     }
 
     /**
+     * @param string $name
+     * @return ApiClient
+     */
+    public static function makeClient(string $name): ApiClient
+    {
+        return ApiClient::make($name);
+    }
+
+    /**
      * @param string $clientId
      * @return bool
      */
