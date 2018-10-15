@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Auth\TokensUserProvider;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 use Landman\MultiTokenAuth\Console\Commands\DeleteClient;
 use Landman\MultiTokenAuth\Console\Commands\MakeApiClient;
 use Landman\MultiTokenAuth\Console\Commands\ListClients;
@@ -30,13 +31,13 @@ class ServiceProvider extends SupportServiceProvider
     {
         // add api user provider.
         Auth::provider('token-users', function ($app, array $config) {
-            return new TokensUserProvider($app->make(Config::get('multipletokens.model')));
+            return new TokensUserProvider(TokenApp::makeUserModel());
         });
 
         // add api guard.
         Auth::extend('multi-tokens', function ($app, $name, array $config) {
             return new TokensGuard(
-                new TokensUserProvider($app->make(Config::get('multipletokens.model'))),
+                new TokensUserProvider(TokenApp::makeUserModel()),
                 $app->make('request'),
                 'api_token',
                 'api_token',
@@ -48,7 +49,7 @@ class ServiceProvider extends SupportServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
 
         // Register routes.
-        $config = Config::get('multipletokens');
+        $config = TokenApp::config();
         Route::prefix($config['route_prefix'])
             ->middleware($config['route_middleware'])
             ->namespace("Landman\\MultiTokenAuth\\Http\\Controllers")

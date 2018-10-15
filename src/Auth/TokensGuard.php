@@ -12,6 +12,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 
 /**
  * Created by PhpStorm.
@@ -64,7 +65,7 @@ class TokensGuard extends TokenGuard
     {
         $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
         if ($this->hasValidCredentials($user, $credentials)) {
-//            $this->fireAuthenticatedEvent($user);
+//            TokenApp::fireAuthenticatedEvent($this,$user);
             $this->login($user, $request);
             return true;
         }
@@ -79,21 +80,15 @@ class TokensGuard extends TokenGuard
      */
     public function login(Authenticatable $user, Request $request)
     {
-        $remember = $request->has('remember') || !config('auth.api_tokens_expire');
         $user_agent = $request->header('user-agent') ?? 'Unknown';
         $device = $request->input('device') ?? 'Unknown';
 
-        $token = new ApiToken(compact('remember', 'user_agent', 'device'));
+        $token = new ApiToken(compact('user_agent', 'device'));
         $token->setExpiresAt();
         $user->apiTokens()->save($token);
         $this->setUser($user);
-        $this->fireLoginEvent($user, $remember);
+        TokenApp::fireLoginEvent($this, $user);
         $this->setToken($token);
-    }
-
-    public function authenticate()
-    {
-        return parent::authenticate();
     }
 
     /**
@@ -137,7 +132,20 @@ class TokensGuard extends TokenGuard
         if ($user) {
             $this->token()->invalidate();
             session()->invalidate();
-            $this->fireLogoutEvent($user);
+            TokenApp::fireLogoutEvent($this, $user);
+        }
+        return $this->token();
+    }
+
+    /**
+     * @return ApiToken
+     */
+    public function logoutAll()
+    {
+        $user = $this->user();
+        if ($user) {
+            $this->user->invalidateAllTokens();
+            TokenApp::fireLogoutEvent($this, $user);
         }
         return $this->token();
     }
@@ -150,9 +158,9 @@ class TokensGuard extends TokenGuard
     public function check()
     {
         $check = !is_null($this->user());
-        $this->fireAuthenticatingEvent($this->token());
+        TokenApp::fireAuthenticatingEvent($this, $this->token());
         if ($check) {
-            $this->fireAuthenticatedEvent($this->user());
+            TokenApp::fireAuthenticatedEvent($this, $this->user());
         }
         return $check;
     }
@@ -164,7 +172,9 @@ class TokensGuard extends TokenGuard
     {
         if (!$this->token) {
             if ($this->user) {
-                $this->token = $this->user->apiTokens()->where('token', $this->getTokenForRequest())->first();
+                $this->token = $this->user->apiTokens()
+                    ->where('token', $this->getTokenForRequest())
+                    ->first();
             }
         }
         return $this->token;
@@ -177,64 +187,4 @@ class TokensGuard extends TokenGuard
     {
         $this->token = $token;
     }
-
-    /**
-     * Fire the authenticating event.
-     *
-     * @param ApiToken|null $token
-     * @return void
-     */
-    protected function fireAuthenticatingEvent(ApiToken $token = null)
-    {
-        if ($this->shouldFireEvents === true) {
-            event(new ApiAuthenticating($this));
-        }
-    }
-
-
-    /**
-     * Fire the authenticated event.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
-     * @return void
-     */
-    protected function fireAuthenticatedEvent($user)
-    {
-        if ($this->shouldFireEvents === true && self::$authenticationFired === false) {
-            self::$authenticationFired = true;
-//            event(new \Illuminate\Auth\Events\Authenticated($this, $user));
-            event(new ApiAuthenticated($this));
-        }
-    }
-
-    /**
-     * Fire the login event.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param  bool $remember
-     * @return void
-     */
-    protected function fireLoginEvent($user, $remember = false)
-    {
-        if ($this->shouldFireEvents === true) {
-//            event(new \Illuminate\Auth\Events\Login($this, $user, false));
-            event(new ApiLogin($this));
-        }
-    }
-
-    /**
-     * Fire the logout event.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param  bool $remember
-     * @return void
-     */
-    protected function fireLogoutEvent($user, $remember = false)
-    {
-        if ($this->shouldFireEvents === true) {
-//            event(new \Illuminate\Auth\Events\Logout($this, $this->user()));
-            event(new ApiLogout($this));
-        }
-    }
-
 }

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Password;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
+use Landman\MultiTokenAuth\Classes\TokenApp;
 use Landman\MultiTokenAuth\Events\ApiRegistered;
 use Landman\MultiTokenAuth\Models\ApiToken;
 use Illuminate\Routing\Controller;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Landman\MultiTokenAuth\Models\ApiClient;
+use Landman\MultiTokenAuth\Traits\ValidatesClientId;
 
 /**
  * Class ApiAuthController
@@ -27,6 +29,7 @@ class ApiAuthController extends Controller
 
     use \Illuminate\Foundation\Validation\ValidatesRequests;
     use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+    use ValidatesClientId;
 
     /**
      * @var mixed
@@ -44,9 +47,9 @@ class ApiAuthController extends Controller
      */
     function __construct(Request $request)
     {
-        $this->guard = Auth::guard('api');
-        $this->config = Config::get('multipletokens');
-        $this->user = app()->make($this->config['model']);
+        $this->guard = TokenApp::guard();
+        $this->config = TokenApp::config();
+        $this->user = TokenApp::makeUserModel();
     }
 
     /**
@@ -94,14 +97,10 @@ class ApiAuthController extends Controller
     public function logoutAll(Request $request)
     {
         $user = $this->guard->user();
-        $this->guard->logout();
-        $count = $request->user()->invalidateAllTokens();
+        $this->guard->logoutAll();
         $this->handleEvent($request, $user, 'afterApiLogout');
 
-        if (class_exists("\\Illuminate\\Auth\\Events\\Logout"))
-            event(new \Illuminate\Auth\Events\Logout($this->guard, $this->guard->user()));
-
-        return response()->json(['count' => $count + 1, 'success' => 1]);
+        return response()->json(['success' => 1]);
     }
 
     /**
@@ -132,13 +131,8 @@ class ApiAuthController extends Controller
             $this->handleEvent($request, $user, 'afterApiRegistered');
 
 
-            $this->guard->attempt($request->only([$this->config['username'], 'password']), $request);
-
+            $this->guard->login($user, $request);
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
-
-
-//            event(new \Illuminate\Auth\Events\Registered($user));
-            event(new ApiRegistered($user));
 
             DB::commit();
 
@@ -167,7 +161,7 @@ class ApiAuthController extends Controller
      * @param ApiToken $apiToken
      * @return \Illuminate\Http\JsonResponse
      */
-    private function authenticationSuccessful($user, ApiToken $apiToken)
+    private function authenticationSuccessful(Authenticatable $user, ApiToken $apiToken)
     {
         $user = $user->toApiFormat();
 
@@ -258,36 +252,6 @@ class ApiAuthController extends Controller
 
     /**
      * @param $request
-     * @return bool
-     */
-    private function requestHasValidClientId($request = nulll)
-    {
-        $request = $request ?? request();
-
-        $clientIds = ApiClient::pluck('value')->toArray();
-        return in_array($request->input('client_id'), $clientIds);
-    }
-
-    /**
-     * @param null $request
-     * @return bool
-     */
-    private function requestHasInvalidClientId($request = null)
-    {
-        $request = $request ?? request();
-        return $this->requestHasValidClientId($request) === false;
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function invalidClientIdResponse()
-    {
-        return response()->json(['message' => 'Invalid client id specified.'], 401);
-    }
-
-    /**
-     * @param $request
      * @param $user
      * @param $eventName
      * @return Authenticatable
@@ -323,6 +287,7 @@ class ApiAuthController extends Controller
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
+        // TODO: Use $user->sendPasswordResetNotification(Password::broker()->createToken());
         $broker = Password::broker();
         $response = $broker->sendResetLink(
             $request->only('email')

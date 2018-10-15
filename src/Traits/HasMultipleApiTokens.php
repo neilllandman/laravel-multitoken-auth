@@ -21,9 +21,9 @@ trait HasMultipleApiTokens
 
     /**
      * @param ApiToken|null $except
-     * @return int
+     * @return bool
      */
-    public function invalidateAllTokens(ApiToken $except = null)
+    public function invalidateAllTokens(ApiToken $except = null): bool
     {
         $query = $this->apiTokens();
         if ($except) {
@@ -33,7 +33,7 @@ trait HasMultipleApiTokens
         $query->each(function (ApiToken $apiToken) {
             $apiToken->invalidate();
         });
-        return $count;
+        return $count > -1;
     }
 
     /**
@@ -53,18 +53,24 @@ trait HasMultipleApiTokens
     }
 
     /**
-     * @param $request
-     */
-    public function onApiRegistered($request)
-    {
-
-    }
-
-    /**
      * @return $this
      */
     public function toApiFormat()
     {
         return $this;
+    }
+
+    /**
+     * @param ApiToken|null $token
+     * @return bool
+     * @throws \Exception
+     */
+    public function apiLogout(ApiToken $token = null)
+    {
+        if ($token) {
+            return $token->invalidate();
+        } else {
+            return $this->invalidateAllTokens();
+        }
     }
 }

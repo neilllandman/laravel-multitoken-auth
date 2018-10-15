@@ -59,9 +59,10 @@ return [
     ],
 
     /*
-     * Whether or not to send an email verification mail to the user. Refer to https://laravel.com/docs/5.7/verification
+     * Whether or not to send an email verification mail to the user.
+     * Refer to https://laravel.com/docs/5.7/verification.
      */
-    'send_verification_email' => false,
+    'send_verification_email' => true,
 
 
     /*
@@ -96,4 +97,11 @@ return [
      * A value of 0 will disable expiration.
      */
     'token_lifetime' => env('TOKEN_LIFETIME', 43200),
+
+    /*
+     * Here you can modify the properties of the authentication guard. This name corrosponds
+     * to the guards array in config/auth.php. Please not that if you change this value,
+     * the default api middleware as declared in App\Http\Kernel will not be used.
+     */
+    'guard_name' => 'api',
 ];
