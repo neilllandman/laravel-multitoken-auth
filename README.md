@@ -241,6 +241,7 @@ To manually issue an ApiToken to a user, the `$user->issueToken()` method can be
 
 To further validate if a user can access the API, you can override the `canAccessApi()` method available from the `HasMultipleApiTokens` trait.
 
+
 For example, if you would like to restrict access to your API to allow only users with certain roles:
 ```
 class User extends Model {
@@ -253,6 +254,25 @@ class User extends Model {
     }
 }
 ```
+
+#### Formatting user response structure
+If you would like to edit the structure for the user model on API responses, you may override the `toApiFormat()` method available from the `HasMultipleApiTokens` trait.
+This method must return either an instance of the user model or an array.
+
+```
+class User extends Model {
+    .
+    .
+    .
+    public function toApiFormat()
+    {
+        $this->makeHidden(['created_at', 'updated_at']);
+        $this->append('role_names');
+        return $this;
+    }
+}
+```
+
 
 # Token Expiration
 
