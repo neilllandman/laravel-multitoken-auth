@@ -60,6 +60,5 @@ class RefreshClient extends Command
             }
             return;
         }
-        $this->info('Operation cancelled.');
     }
 }

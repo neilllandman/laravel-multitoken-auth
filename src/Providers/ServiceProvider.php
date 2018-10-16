@@ -33,9 +33,11 @@ class ServiceProvider extends SupportServiceProvider
 
 
         // add api user provider.
+        // @codeCoverageIgnoreStart
         Auth::provider('token-users', function ($app, array $config) {
             return new TokensUserProvider(TokenApp::makeUserModel());
         });
+        // @codeCoverageIgnoreEnd
 
         // add api guard.
         Auth::extend('multi-tokens', function ($app, $name, array $config) {

@@ -84,7 +84,7 @@ return [
 
     /*
      * Mappings. If you would like to change the default route paths, you can do that here. If you
-     * would like to disable any of these routes, you can comment them out individually.
+     * would like to disable any of these routes, you can set them equal to null individually.
      */
     'route_mappings' => [
         'login' => '/auth/login',
@@ -95,6 +95,7 @@ return [
         'logout_all' => '/auth/logout-all',
         'password_email' => 'password/email',
         'password_update' => 'password/update',
+        'token_refresh' => 'token/refresh',
     ],
 
     /*
@@ -102,9 +103,15 @@ return [
      */
 
     /*
+     * All tokens are refreshed upon use by default. If you wish to disable this behaviour, you can set this
+     * value to false. Note that you will have to manually refresh the tokens using the token refresh route.
+     */
+    'auto_refresh_tokens' => true,
+
+    /*
      * How long it takes for a token to expire. Tokens get refreshed everytime they are used. Hence, a
      * lifetime of 43200 minutes will cause the token to expire if it hasn't been used for 30 days.
-     * A value of 0 will disable expiration.
+     * A value of 0 will disable expiration completely.
      */
     'token_lifetime' => env('TOKEN_LIFETIME', 43200),
 

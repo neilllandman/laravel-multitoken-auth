@@ -8,6 +8,7 @@ use Landman\MultiTokenAuth\Models\ApiToken;
 
 /**
  * Trait HasMultipleApiTokens
+ * @codeCoverageIgnore
  * @package Landman\MultiTokenAuth\Traits
  */
 trait ListensOnApiEvents

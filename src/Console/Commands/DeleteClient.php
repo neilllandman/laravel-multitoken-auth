@@ -47,8 +47,8 @@ class DeleteClient extends Command
     public function handle()
     {
         $confirm = $this->option('yes') || $this->confirm(
-            'This will permanently delete this ID and all clients using it will no longer be able access your API. Continue?'
-        );
+                'This will permanently delete this ID and all clients using it will no longer be able access your API. Continue?'
+            );
         if ($confirm) {
             $client = ApiClient::where('name', $this->argument('name'))->first();
 
@@ -60,6 +60,6 @@ class DeleteClient extends Command
             }
             return;
         }
-        $this->info('Operation cancelled.');
     }
 }
+

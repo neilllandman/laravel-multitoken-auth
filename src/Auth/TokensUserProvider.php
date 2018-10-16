@@ -19,12 +19,14 @@ class TokensUserProvider implements UserProvider
     /**
      * The Eloquent user model.
      *
+     * @codeCoverageIgnore
      * @var string
      */
     protected $model;
 
     /**
      * @var string
+     * @codeCoverageIgnore
      */
     protected $relationName;
 
@@ -44,6 +46,7 @@ class TokensUserProvider implements UserProvider
      * Retrieve a user by their unique identifier.
      *
      * @param  mixed $identifier
+     * @codeCoverageIgnore
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveById($identifier)
@@ -60,6 +63,7 @@ class TokensUserProvider implements UserProvider
      *
      * @param  mixed $identifier
      * @param  string $token
+     * @codeCoverageIgnore
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveByToken($identifier, $token)
@@ -71,6 +75,7 @@ class TokensUserProvider implements UserProvider
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @param  string $token
+     * @codeCoverageIgnore
      * @return void
      */
     public function updateRememberToken(Authenticatable $user, $token)
@@ -139,6 +144,7 @@ class TokensUserProvider implements UserProvider
 
     /**
      * Create a new instance of the model.
+     * @codeCoverageIgnore
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
@@ -151,6 +157,7 @@ class TokensUserProvider implements UserProvider
     /**
      * Gets the name of the Eloquent user model.
      *
+     * @codeCoverageIgnore
      * @return string
      */
     public function getModel()
@@ -162,6 +169,8 @@ class TokensUserProvider implements UserProvider
      * Sets the name of the Eloquent user model.
      *
      * @param  string $model
+     * @codeCoverageIgnore
+     *
      * @return $this
      */
     public function setModel($model)

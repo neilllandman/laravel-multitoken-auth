@@ -19,6 +19,7 @@ use Landman\MultiTokenAuth\Classes\TokenApp;
  * User: neilllandman
  * Date: 2018/03/07
  * Time: 08:27
+ * @property TokensUserProvider $provider
  *
  */
 class TokensGuard extends TokenGuard
@@ -96,6 +97,7 @@ class TokensGuard extends TokenGuard
      * Validate a user's credentials.
      *
      * @param  array $credentials
+     * @codeCoverageIgnore
      * @return bool
      */
     public function validate(array $credentials = [])

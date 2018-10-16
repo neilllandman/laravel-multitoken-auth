@@ -8,6 +8,7 @@
 
 namespace Landman\MultiTokenAuth\Classes;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
@@ -63,29 +64,49 @@ class TokenApp
      */
     public static function test()
     {
-        self::$config = self::$defaultConfig;
         self::$test = true;
     }
 
     /**
-     *
+     * @return void
      */
     public static function boot()
     {
+        self::makeConfig();
         self::$shouldFireEvents = true;
-        self::$defaultConfig = require(__DIR__ . "/../../config/multipletokens.php");
-    }
-
-    /**
-     *
-     */
-    private static function makeConfig()
-    {
-        self::$config = Config::get(self::CONFIG_SPACE);
-
+        self::$booted = true;
         if (app()->environment() === 'testing') {
             self::test();
         }
+    }
+
+    /**
+     * @return void
+     */
+    private static function makeConfig()
+    {
+        self::$defaultConfig = require(__DIR__ . "/../../config/multipletokens.php");
+        if (app()->environment() !== 'testing') {
+            self::$config = Config::get(self::CONFIG_SPACE);
+        } else {
+            self::$config = self::$defaultConfig;
+            self::$config['send_verification_email'] = true;
+        }
+        self::mergeRouteMappings();
+    }
+
+    /**
+     * @return void
+     */
+    private static function mergeRouteMappings()
+    {
+        $routeMappings = array_filter(
+            array_merge(
+                self::$defaultConfig['route_mappings'],
+                self::$config['route_mappings'] ?? []
+            )
+        );
+        self::$config['route_mappings'] = $routeMappings;
     }
 
     /**
@@ -98,10 +119,8 @@ class TokenApp
         if (empty(self::$config)) {
             self::makeConfig();
         }
-        $configString = self::CONFIG_SPACE;
         if ($config) {
             return array_get(self::$config, $config) ?? $default;
-
         }
         return self::$config;
     }
@@ -219,18 +238,27 @@ class TokenApp
     }
 
     /**
-     * @param string $clientId
+     * @param null|string $clientId
+     * @param bool $errorOnFail
      * @return bool
+     * @throws AuthenticationException
      */
-    public static function validateClientId(string $clientId): bool
+    public static function validateClientId(?string $clientId, bool $errorOnFail = false): bool
     {
+        if ($clientId === null) {
+            return false;
+        }
         $clientIds = ApiClient::pluck('value')->toArray();
 
-        if (App::environment() === 'local' && !empty(env('API_TEST_CLIENT_ID'))) {
+        if (App::environment() !== 'production' && !empty(env('API_TEST_CLIENT_ID'))) {
             $clientIds[] = env('API_TEST_CLIENT_ID');
         }
 
-        return in_array($clientId, $clientIds);
+        $valid = in_array($clientId, array_filter($clientIds));
+        if ($errorOnFail) {
+            throw new AuthenticationException("Invalid client id.");
+        }
+        return $valid;
     }
 
     /**

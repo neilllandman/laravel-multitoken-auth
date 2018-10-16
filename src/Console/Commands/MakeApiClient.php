@@ -50,7 +50,6 @@ class MakeApiClient extends Command
         }
 
         ApiClient::make($this->argument('name'));
-//$this->info("{$clientId");
         $this->table(['Name', 'Api Client ID'], [ApiClient::latest()->first(['name', 'value'])->toArray()]);
     }
 }

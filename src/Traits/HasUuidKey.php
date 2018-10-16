@@ -14,6 +14,7 @@ use Ramsey\Uuid\Uuid;
  */
 trait HasUuidKey
 {
+
     /**
      * Boot the trait
      */
@@ -78,6 +79,7 @@ trait HasUuidKey
      * Get the auto-incrementing key type.
      * {@inheritdoc}
      *
+     * @codeCoverageIgnore
      * @return string
      */
     public function getKeyType()

@@ -1,5 +1,5 @@
 <?php
-$mappings = \Illuminate\Support\Facades\Config::get('multipletokens.route_mappings');
+$mappings = \Landman\MultiTokenAuth\Classes\TokenApp::config('route_mappings');
 
 Route::group([], function () use ($mappings) {
     Route::group([], function () use ($mappings) {
@@ -22,6 +22,8 @@ Route::group([], function () use ($mappings) {
                 Route::get($mappings['user'], 'ApiAuthController@user');
             if (isset($mappings['password_update']))
                 Route::post($mappings['password_update'], 'ApiAuthController@updatePassword');
+            if (isset($mappings['token_refresh']))
+                Route::post($mappings['token_refresh'], 'ApiAuthController@refreshToken');
         });
         if (isset($mappings['password_email']))
             Route::post($mappings['password_email'], 'ApiAuthController@sendResetLinkEmail');

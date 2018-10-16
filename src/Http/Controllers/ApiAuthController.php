@@ -67,9 +67,7 @@ class ApiAuthController extends Controller
     {
         $this->validate($request, $this->getLoginValidationRules());
 
-        if ($this->requestHasInvalidClientId()) {
-            return $this->invalidClientIdResponse();
-        }
+        $this->validateClientId();
 
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
@@ -118,9 +116,7 @@ class ApiAuthController extends Controller
     {
         $this->validate($request, $this->getRegisterValidationRules());
 
-        if ($this->requestHasInvalidClientId()) {
-            return $this->invalidClientIdResponse();
-        }
+        $this->validateClientId();
 
         $userData = $request->only($this->getRegistrationFields());
 
@@ -140,11 +136,16 @@ class ApiAuthController extends Controller
 
             DB::commit();
             TokenApp::fireRegisterEvent($this->guard);
-            return $this->guard->authenticatedResponse();
+            return $this->guard->authenticatedResponse(true);
 
+            // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             DB::rollBack();
-            throw $e;
+            return response()->json([
+                'message' => 'Could not register.',
+                'error' => $e->getMessage()
+            ], 500);
+            // @codeCoverageIgnoreEnd
         }
 
     }
@@ -190,6 +191,7 @@ class ApiAuthController extends Controller
             } else {
                 return response()->json(['message' => trans('auth.failed')], 401);
             }
+            // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getTraceAsString());
@@ -198,6 +200,7 @@ class ApiAuthController extends Controller
                 'message' => trans('errors.general'),
             ], 500);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -257,6 +260,7 @@ class ApiAuthController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws AuthenticationException
      */
     public function sendResetLinkEmail(Request $request)
     {
@@ -265,9 +269,7 @@ class ApiAuthController extends Controller
             'email' => 'required|email',
         ]);
 
-        if ($this->requestHasInvalidClientId()) {
-            return $this->invalidClientIdResponse();
-        }
+        $this->validateClientId();
 
         $username = TokenApp::config('username');
         $user = User::where([
@@ -275,11 +277,13 @@ class ApiAuthController extends Controller
         ])->first();
 
 
+        // @codeCoverageIgnoreStart
         if (!$user) {
             return response()->json([
                 'message' => 'We can\'t find a user with that e-mail address.'
             ], 422);
         }
+        // @codeCoverageIgnoreEnd
 
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
@@ -294,11 +298,13 @@ class ApiAuthController extends Controller
             return response()->json([
                 'message' => trans('passwords.sent')
             ]);
+            // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json(['message' => ''], 500);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -321,34 +327,18 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws AuthenticationException
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function refreshToken(Request $request)
     {
-        $this->validateClientId();
-        $this->validate($request, [
-            'refresh_token' => 'required|string',
-            'password' => 'required',
-        ]);
-
-        $apiToken = ApiToken::withTrashed()
-            ->where('refresh_token', $request->input('refresh_token'))
-            ->first();
-
-        if ($apiToken) {
-            $user = $apiToken->user;
-            if ($user) {
-                if ($this->guard->getProvider()->validateCredentials($user, $request->only(['password']))) {
-                    $apiToken->updateExpiresAt();
-                }
-
-                return response()->json($apiToken);
-            }
+        try {
+            $this->guard->token()->refreshToken();
+            return $this->guard->authenticatedResponse();
+            // @codeCoverageIgnoreStart
+        } catch (\Exception $e) {
+            return response()->json(['Could not refresh token.'], 500);
         }
-        throw new AuthenticationException();
+        // @codeCoverageIgnoreEnd
     }
-
 
     /**
      * @param Request $request
@@ -358,17 +348,21 @@ class ApiAuthController extends Controller
     public function devicesLogout(Request $request, string $id)
     {
         $apiToken = ApiToken::withTrashed()->find($id);
+        // @codeCoverageIgnoreStart
         if (!$apiToken) {
             return response()->json(['message' => 'Invalid id.'], 422);
         }
+        // @codeCoverageIgnoreEnd
         try {
             $apiToken->invalidate();
             return response()->json(['success' => 1]);
+            // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
                 'message' => 'Could not log out of device.'
             ], 500);
         }
+        // @codeCoverageIgnoreEnd
     }
 }

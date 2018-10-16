@@ -68,29 +68,13 @@ class ApiToken extends Model
 
     /**
      * @param $query
+     * @codeCoverageIgnore
      * @return mixed
      */
     public function scopeInvalid($query)
     {
         return $query->where('expires_at', '<', now());
     }
-
-    /**
-     * @return mixed
-     */
-    public static function cleanInvalid()
-    {
-        return ApiToken::invalid()->delete();
-    }
-
-    /**
-     * @return bool
-     */
-    public static function shouldExpire(): bool
-    {
-        return Config::get('multipletokens.token_lifetime') > 0;
-    }
-
 
     /**
      *
@@ -132,7 +116,32 @@ class ApiToken extends Model
     }
 
     /**
+     * @return mixed
+     */
+    public static function cleanInvalid()
+    {
+        return ApiToken::invalid()->delete();
+    }
+
+    /**
+     * @return bool
+     */
+    public static function shouldExpire(): bool
+    {
+        return Config::get('multipletokens.token_lifetime') > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function shouldAutoRefresh(): bool
+    {
+        return Config::get('multipletokens.auto_refresh_tokens') === true;
+    }
+
+    /**
      * @param $key
+     * @codeCoverageIgnore
      * @return mixed
      */
     public function getAttribute($key)
@@ -150,6 +159,7 @@ class ApiToken extends Model
     /**
      * @param $key
      * @param $value
+     * @codeCoverageIgnore
      * @return $this
      */
     public function setAttribute($key, $value)
@@ -163,6 +173,7 @@ class ApiToken extends Model
 
     /**
      * @param $value
+     * @codeCoverageIgnore
      * @return string
      */
     public function encryptValue($value): string
@@ -173,6 +184,7 @@ class ApiToken extends Model
 
     /**
      * @param $value
+     * @codeCoverageIgnore
      * @return string
      */
     public function decryptValue($value): string
@@ -207,11 +219,24 @@ class ApiToken extends Model
 
     /**
      * @return bool
+     * @codeCoverageIgnore
      * @throws \Exception
      */
     public function expire(): bool
     {
         return $this->invalidate();
+    }
+
+    /**
+     * @return $this
+     */
+    public function refreshToken()
+    {
+        $this->token = static::generateNewToken();
+        $this->refresh_token = static::generateNewToken();
+        $this->expires_at = self::generateExpiresAtDate();
+        $this->save();
+        return $this;
     }
 
     /**
@@ -244,12 +269,14 @@ class ApiToken extends Model
     /**
      * @return array
      */
-    public function toApiFormat(){
+    public function toApiFormat()
+    {
 //        $expires_at = $this->expires_at instanceof Carbon ? $this->expires_at->toDateTimeString() : $this->expires_at;
         return [
 //            'user_id' => $this->user_id,
             'token' => $this->token,
-//            'expires_at' => ApiToken::shouldExpire() ? new Carbon($this->expires_at) : null,
+            'expires_at' => ApiToken::shouldExpire() ? new Carbon($this->expires_at) : null,
+//            'refresh_token' => $this->refresh_token,
         ];
     }
 }

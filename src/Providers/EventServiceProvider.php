@@ -30,11 +30,11 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $listen = [
-//        Registered::class => [
-//            SendEmailVerificationNotification::class,
-//        ],
-    ];
+//    protected $listen = [
+////        Registered::class => [
+////            SendEmailVerificationNotification::class,
+////        ],
+//    ];
 
     /**
      * Register any events for your application.
@@ -60,9 +60,9 @@ class EventServiceProvider extends ServiceProvider
                 }
             }
         });
-
         Event::listen(ApiAuthenticated::class, function (ApiAuthenticated $event) {
-            $event->guard->token()->updateExpiresAt();
+            if (ApiToken::shouldAutoRefresh())
+                $event->guard->token()->updateExpiresAt();
         });
 
         Event::listen(ApiLogin::class, function (ApiLogin $event) {
