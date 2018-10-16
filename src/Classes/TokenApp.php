@@ -11,6 +11,7 @@ namespace Landman\MultiTokenAuth\Classes;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Landman\MultiTokenAuth\Auth\TokensGuard;
 use Landman\MultiTokenAuth\Events\ApiAuthenticated;
 use Landman\MultiTokenAuth\Events\ApiAuthenticating;
@@ -34,6 +35,25 @@ class TokenApp
     const CONFIG_SPACE = 'multipletokens';
 
     /**
+     * @var array
+     */
+    public static $defaultConfig = [];
+
+    /**
+     * @var array
+     */
+    public static $config = [];
+    /**
+     * @var bool
+     */
+    public static $test = false;
+    /**
+     * @var
+     */
+    private static $booted;
+
+
+    /**
      * @var bool
      */
     public static $shouldFireEvents = true;
@@ -41,9 +61,31 @@ class TokenApp
     /**
      *
      */
-    public function boot()
+    public static function test()
+    {
+        self::$config = self::$defaultConfig;
+        self::$test = true;
+    }
+
+    /**
+     *
+     */
+    public static function boot()
     {
         self::$shouldFireEvents = true;
+        self::$defaultConfig = require(__DIR__ . "/../../config/multipletokens.php");
+    }
+
+    /**
+     *
+     */
+    private static function makeConfig()
+    {
+        self::$config = Config::get(self::CONFIG_SPACE);
+
+        if (app()->environment() === 'testing') {
+            self::test();
+        }
     }
 
     /**
@@ -53,11 +95,15 @@ class TokenApp
      */
     public static function config(string $config = null, $default = null)
     {
+        if (empty(self::$config)) {
+            self::makeConfig();
+        }
         $configString = self::CONFIG_SPACE;
         if ($config) {
-            $configString = self::CONFIG_SPACE . ".{$config}";
+            return array_get(self::$config, $config) ?? $default;
+
         }
-        return \Illuminate\Support\Facades\Config::get($configString, $default);
+        return self::$config;
     }
 
 

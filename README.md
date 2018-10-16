@@ -132,6 +132,13 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 </tr>
 <tr>
 <td>POST</td>
+<td>/api/auth/user/api-devices/logout/{id}</td>
+<td>Logout from a specific device.</td>
+<td>Yes</td>
+<td>None</td>
+</tr>
+<tr>
+<td>POST</td>
 <td>/api/password/email</td>
 <td>Send a password reset link via email.</td>
 <td>No</td>
@@ -184,7 +191,9 @@ Response example:
         "created_at": "2018-10-10 12:09:12",
         "updated_at": "2018-10-10 12:09:12"
         },
-    "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
+    "auth": {
+        "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
+        }
  }
 ```
     
@@ -591,20 +600,12 @@ retrieved from the database and returns and instance of `\Illuminate\Http\JsonRe
 ```
  {
     "user": [as defined in $user->toApiFormat()],
-    "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
+    "auth": {
+            "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
+        }   
  } 
 ```
  
 An `AuthenticationException` is thrown if the user is not authenticated via the `login` or `attempt` methods.
 
-# Testing
-
-### Test assumptions
-
-The tests assume that you have a factory defined for the specified user model class. See https://laravel.com/docs/5.7/database-testing#writing-factories for more information regarding factories.
-
-### Running tests
-You can run tests by running the following command in your project's base directory
-
-`vendor/bin/phpunit vendor/neilllandman/laravel-multitoken-auth/tests`
 

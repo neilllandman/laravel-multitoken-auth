@@ -29,6 +29,9 @@ class ServiceProvider extends SupportServiceProvider
      */
     public function boot()
     {
+        TokenApp::boot();
+
+
         // add api user provider.
         Auth::provider('token-users', function ($app, array $config) {
             return new TokensUserProvider(TokenApp::makeUserModel());
@@ -70,6 +73,8 @@ class ServiceProvider extends SupportServiceProvider
                 ListClients::class,
             ]);
         }
+
+
     }
 
     /**
@@ -77,7 +82,6 @@ class ServiceProvider extends SupportServiceProvider
      */
     public function register()
     {
-
         $this->mergeConfigFrom(
             __DIR__ . '/../../config/multipletokens.php', 'multipletokens'
         );

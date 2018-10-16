@@ -2,7 +2,6 @@
 $mappings = \Illuminate\Support\Facades\Config::get('multipletokens.route_mappings');
 
 Route::group([], function () use ($mappings) {
-
     Route::group([], function () use ($mappings) {
         if (isset($mappings['login']))
             Route::post($mappings['login'], 'ApiAuthController@login');
@@ -10,10 +9,13 @@ Route::group([], function () use ($mappings) {
             Route::post($mappings['register'], 'ApiAuthController@register');
 
         Route::group(['middleware' => 'auth:api'], function () use ($mappings) {
-            if (isset($mappings['devices']))
+            if (isset($mappings['devices'])) {
                 Route::get($mappings['devices'], 'ApiAuthController@devices');
-            if (isset($mappings['logout']))
+                Route::post($mappings['devices'] . "/logout/{id}", 'ApiAuthController@devicesLogout');
+            }
+            if (isset($mappings['logout'])) {
                 Route::post($mappings['logout'], 'ApiAuthController@logout');
+            }
             if (isset($mappings['logout_all']))
                 Route::post($mappings['logout_all'], 'ApiAuthController@logoutAll');
             if (isset($mappings['user']))

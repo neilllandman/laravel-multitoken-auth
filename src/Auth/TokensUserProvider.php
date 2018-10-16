@@ -107,13 +107,13 @@ class TokensUserProvider implements UserProvider
             $query->where(TokenApp::config('username'), $credentials[TokenApp::config('username')]);
 
             return $query->first();
-            foreach ($credentials as $key => $value) {
-                if (!Str::contains($key, 'password')) {
-                    $query->where($key, $value);
-                }
-            }
-
-            return $query->first();
+//            foreach ($credentials as $key => $value) {
+//                if (!Str::contains($key, 'password')) {
+//                    $query->where($key, $value);
+//                }
+//            }
+//
+//            return $query->first();
         }
         return;
 

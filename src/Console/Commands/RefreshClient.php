@@ -16,7 +16,10 @@ class RefreshClient extends Command
      *
      * @var string
      */
-    protected $signature = 'landman:tokens:refresh-client {name : The name of the client}';
+    protected $signature = 'landman:tokens:refresh-client 
+    {name : The name of the client}
+    {--y|yes : Yes to prompt} 
+    ';
 
     /**
      * The console command description.
@@ -43,9 +46,9 @@ class RefreshClient extends Command
      */
     public function handle()
     {
-        $confirm = $this->confirm(
-            'This will permanently change this ID and all clients using it will no longer be able access your API. Continue?'
-        );
+        $confirm = $this->option('yes') || $this->confirm(
+                'This will permanently change this ID and all clients using it will no longer be able access your API. Continue?'
+            );
         if ($confirm) {
             $client = ApiClient::where('name', $this->argument('name'))->first();
             if ($client) {

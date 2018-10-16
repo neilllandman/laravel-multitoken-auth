@@ -18,6 +18,7 @@ class DeleteClient extends Command
      */
     protected $signature = 'landman:tokens:delete-client 
     {name : The name of the client}
+    {--y|yes : Yes to prompt} 
     ';
 
     /**
@@ -45,8 +46,7 @@ class DeleteClient extends Command
      */
     public function handle()
     {
-
-        $confirm = $this->confirm(
+        $confirm = $this->option('yes') || $this->confirm(
             'This will permanently delete this ID and all clients using it will no longer be able access your API. Continue?'
         );
         if ($confirm) {

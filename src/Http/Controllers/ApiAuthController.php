@@ -3,6 +3,7 @@
 namespace Landman\MultiTokenAuth\Http\Controllers;
 
 use App\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Password;
@@ -40,6 +41,9 @@ class ApiAuthController extends Controller
     /** @var array */
     protected $config;
 
+    /**
+     * @var
+     */
     protected $shouldFireEvents;
 
     /**
@@ -261,7 +265,9 @@ class ApiAuthController extends Controller
             'email' => 'required|email',
         ]);
 
-        TokenApp::validateClientId($request->input('client_id'));
+        if ($this->requestHasInvalidClientId()) {
+            return $this->invalidClientIdResponse();
+        }
 
         $username = TokenApp::config('username');
         $user = User::where([
@@ -278,8 +284,6 @@ class ApiAuthController extends Controller
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
-        // TODO: Use $user->sendPasswordResetNotification(Password::broker()->createToken());
-
 
         try {
             DB::beginTransaction();
@@ -309,8 +313,62 @@ class ApiAuthController extends Controller
                 'user_agent',
                 'device',
                 'updated_at',
+                'created_at',
             ])
         );
+    }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws AuthenticationException
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function refreshToken(Request $request)
+    {
+        $this->validateClientId();
+        $this->validate($request, [
+            'refresh_token' => 'required|string',
+            'password' => 'required',
+        ]);
+
+        $apiToken = ApiToken::withTrashed()
+            ->where('refresh_token', $request->input('refresh_token'))
+            ->first();
+
+        if ($apiToken) {
+            $user = $apiToken->user;
+            if ($user) {
+                if ($this->guard->getProvider()->validateCredentials($user, $request->only(['password']))) {
+                    $apiToken->updateExpiresAt();
+                }
+
+                return response()->json($apiToken);
+            }
+        }
+        throw new AuthenticationException();
+    }
+
+
+    /**
+     * @param Request $request
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function devicesLogout(Request $request, string $id)
+    {
+        $apiToken = ApiToken::withTrashed()->find($id);
+        if (!$apiToken) {
+            return response()->json(['message' => 'Invalid id.'], 422);
+        }
+        try {
+            $apiToken->invalidate();
+            return response()->json(['success' => 1]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Could not log out of device.'
+            ], 500);
+        }
     }
 }

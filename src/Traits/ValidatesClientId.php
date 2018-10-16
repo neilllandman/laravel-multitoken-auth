@@ -9,6 +9,7 @@
 namespace Landman\MultiTokenAuth\Traits;
 
 
+use Illuminate\Auth\AuthenticationException;
 use Landman\MultiTokenAuth\Classes\TokenApp;
 
 /**
@@ -40,5 +41,17 @@ trait ValidatesClientId
     private function invalidClientIdResponse()
     {
         return response()->json(['message' => 'Invalid client id specified.'], 401);
+    }
+
+    /**
+     * @return bool
+     * @throws AuthenticationException
+     */
+    protected function validateClientId(): bool
+    {
+        if (TokenApp::validateClientId(request()->input('client_id')) === false) {
+            throw new AuthenticationException('Invalid client id.');
+        }
+        return true;
     }
 }

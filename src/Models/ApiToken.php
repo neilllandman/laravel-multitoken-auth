@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Crypt;
  * @property string $user_agent
  * @property string $device
  *
+ * @property string $user_id
  * @property Carbon|string $expires_at
  * @property Carbon|string $deleted_at
  * @property Carbon|string $created_at
@@ -52,6 +53,9 @@ class ApiToken extends Model
         'remember' => 'boolean',
     ];
 
+    /**
+     * @var array
+     */
     protected $dates = ['created_at', 'updated_at', 'expires_at'];
 
     /**
@@ -235,5 +239,17 @@ class ApiToken extends Model
     {
         parent::getTable();
         return TokenApp::config('table_tokens');
+    }
+
+    /**
+     * @return array
+     */
+    public function toApiFormat(){
+//        $expires_at = $this->expires_at instanceof Carbon ? $this->expires_at->toDateTimeString() : $this->expires_at;
+        return [
+//            'user_id' => $this->user_id,
+            'token' => $this->token,
+//            'expires_at' => ApiToken::shouldExpire() ? new Carbon($this->expires_at) : null,
+        ];
     }
 }

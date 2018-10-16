@@ -231,8 +231,7 @@ class TokensGuard extends TokenGuard
             $user = $this->user();
             return response()->json([
                 'user' => $user->toApiFormat(),
-                'token' => $this->token()->token,
-//                'expires_at' => $this->token()->expires_at,
+                'auth' => $this->token()->toApiFormat()
             ]);
         }
         throw new AuthenticationException();
