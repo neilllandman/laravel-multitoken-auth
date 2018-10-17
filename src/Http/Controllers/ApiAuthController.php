@@ -65,9 +65,10 @@ class ApiAuthController extends Controller
      */
     public function login(Request $request)
     {
+        $this->validateClientId();
+        
         $this->validate($request, $this->getLoginValidationRules());
 
-        $this->validateClientId();
 
         if ($this->guard->attempt($request->only([$this->config['username'], 'password']), $request)) {
             $this->handleEvent($request, $this->guard->user(), 'afterApiLogin');
@@ -141,10 +142,7 @@ class ApiAuthController extends Controller
             // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Could not register.',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse($e);
             // @codeCoverageIgnoreEnd
         }
 
@@ -163,6 +161,7 @@ class ApiAuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \Exception
      */
     public function updatePassword(Request $request)
     {
@@ -194,11 +193,7 @@ class ApiAuthController extends Controller
             // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getTraceAsString());
-            return response()->json([
-                'error' => $e->getMessage(),
-                'message' => trans('errors.general'),
-            ], 500);
+            return $this->errorResponse($e);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -261,7 +256,9 @@ class ApiAuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      * @throws AuthenticationException
+     * @throws \Exception
      */
+
     public function sendResetLinkEmail(Request $request)
     {
         $this->validate($request, [
@@ -301,8 +298,8 @@ class ApiAuthController extends Controller
             // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
             DB::rollBack();
+            return $this->errorResponse($e);
 
-            return response()->json(['message' => ''], 500);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -327,6 +324,7 @@ class ApiAuthController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function refreshToken(Request $request)
     {
@@ -335,7 +333,7 @@ class ApiAuthController extends Controller
             return $this->guard->authenticatedResponse();
             // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
-            return response()->json(['Could not refresh token.'], 500);
+            return $this->errorResponse($e);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -344,6 +342,7 @@ class ApiAuthController extends Controller
      * @param Request $request
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function devicesLogout(Request $request, string $id)
     {
@@ -358,11 +357,22 @@ class ApiAuthController extends Controller
             return response()->json(['success' => 1]);
             // @codeCoverageIgnoreStart
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'Could not log out of device.'
-            ], 500);
+            return $this->errorResponse($e);
         }
         // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * @param \Exception $e
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    private function errorResponse(\Exception $e)
+    {
+        if (config('app.debug', false)) {
+            throw $e;
+        } else {
+            return response()->json(['message' => 'Server error.', 'code' => $e->getCode() ?? 500], 500);
+        }
     }
 }
