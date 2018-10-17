@@ -45,7 +45,7 @@ class MakeApiClient extends Command
     public function handle()
     {
         if(ApiClient::where('name', $this->argument('name'))->count()){
-            $this->error('Name already used.');
+            $this->error("Client with name {$this->argument('name')} already exists!");
             return;
         }
 

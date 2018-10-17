@@ -46,19 +46,39 @@ class RefreshClient extends Command
      */
     public function handle()
     {
-        $confirm = $this->option('yes') || $this->confirm(
-                'This will permanently change this ID and all clients using it will no longer be able access your API. Continue?'
-            );
+        $confirm = $this->askConfirmation();
         if ($confirm) {
-            $client = ApiClient::where('name', $this->argument('name'))->first();
+            $client = $this->findClient();
             if ($client) {
                 $client->remake();
-                $this->line("Client updated!");
+                $this->info("Client updated!");
                 $this->table(['Name', 'Api Client ID'], [ApiClient::latest()->first(['name', 'value'])->toArray()]);
             } else {
                 $this->error("No client with name {$this->argument('name')} found!");
             }
             return;
         }
+        // @codeCoverageIgnoreStart
+        $this->info("Operation cancelled.");
+    }
+    // @codeCoverageIgnoreEnd
+
+
+    /**
+     * @return bool
+     */
+    protected function askConfirmation()
+    {
+        return $this->option('yes') || $this->confirm(
+                'This will permanently delete this ID and all clients using it will no longer be able access your API. Continue?'
+            );
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function findClient()
+    {
+        return ApiClient::where('name', $this->argument('name'))->first();
     }
 }

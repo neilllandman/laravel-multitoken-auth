@@ -87,7 +87,9 @@ class TokenApp
     {
         self::$defaultConfig = require(__DIR__ . "/../../config/multipletokens.php");
         if (app()->environment() !== 'testing') {
+            // @codeCoverageIgnoreStart
             self::$config = Config::get(self::CONFIG_SPACE);
+            // @codeCoverageIgnoreEnd
         } else {
             self::$config = self::$defaultConfig;
             self::$config['send_verification_email'] = true;
@@ -116,9 +118,6 @@ class TokenApp
      */
     public static function config(string $config = null, $default = null)
     {
-        if (empty(self::$config)) {
-            self::makeConfig();
-        }
         if ($config) {
             return array_get(self::$config, $config) ?? $default;
         }
