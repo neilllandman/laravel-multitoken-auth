@@ -111,7 +111,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 </tr>
 <tr>
 <td>POST</td>
-<td>/api/auth/logout_all</td>
+<td>/api/auth/logout-all</td>
 <td>Logout a user from all their devices and invalidates all tokens.</td>
 <td>Yes</td>
 <td>None</td>
@@ -436,17 +436,14 @@ To hook into the login and register functions, add the <code>ListensOnApiEvents<
     }
 
 This trait exposes the following methods, all of which receives the current request as the only parameter and must return the user.
-<table>
-<thead>
-<tr><th>Method Name</th><th>Description</th><tr>
-</thead>
-<tbody>
-<tr><td><code>beforeApiRegistered</code></td><td>Runs before the model is saved. (You can save the user inside the method as well).</td><tr>
-<tr><td><code>afterApiRegistered</code></td><td>Runs after successful registeration.</td><tr>
-<tr><td><code>afterApiLogin</code></td><td>Runs after successful login. This method also gets fired after <code>afterApiRegistered</code></td><tr>
-<tr><td><code>afterApiLogout</code></td><td>Runs after successful logout.</td><tr>
-</tbody>
-</table>
+
+| Method Name           | Description                                                                           |
+|-----------------------|---------------------------------------------------------------------------------------|
+| beforeApiRegistered   | Runs before the model is saved. (You can save the user inside the method as well).    |
+| afterApiRegistered    | Runs after successful registeration.                                                  |
+| afterApiLogin         | Runs after successful login. This method also gets fired after afterApiRegistered.    |
+| afterApiLogout        | Runs after successful logout.                                                         |
+
 
 Example:
 
@@ -470,33 +467,26 @@ Example:
  
 ### Via Event Listeners
 If you would like to register your own listeners, you can attach them to the following events
- 
-<table>
-<thead>
-<tr><th>Event</th></tr>
-</thead>
-<tbody>
-<tr><td>Landman\MultiTokenAuth\Events\ApiAuthenticated</td></tr>
-<tr><td>Landman\MultiTokenAuth\Events\ApiAuthenticating</td></tr>
-<tr><td>Landman\MultiTokenAuth\Events\ApiLogin</td></tr>
-<tr><td>Landman\MultiTokenAuth\Events\ApiLogout</td></tr>
-<tr><td>Landman\MultiTokenAuth\Events\ApiRegistered</td></tr>
-</tbody>
-</table>
+
+
+
+| Event                                             |
+| ------------------------------------------------- |
+| Landman\MultiTokenAuth\Events\ApiAuthenticated    |
+| Landman\MultiTokenAuth\Events\ApiAuthenticating   |
+| Landman\MultiTokenAuth\Events\ApiLogin            |
+| Landman\MultiTokenAuth\Events\ApiLogout           |
+| Landman\MultiTokenAuth\Events\ApiRegistered       |
 
 Each of these events expose the following properties:
-
  
-<table>
-<thead>
-<tr><th>Property</th><th>Description</th></tr>
-</thead>
-<tbody>
-<tr><td>$guard</td><td>The authentication guard</td></tr>
-<tr><td>$user</td><td>The user that is currently being authenticated or is authenticated.</td></tr>
-<tr><td>$token</td><td>The ApiToken used for authentication. Note that the token will be null for the ApiAuthenticating event.</td></tr>
-</tbody>
-</table>
+
+| Property      | Description                                                                                             |
+| ------------- |---------------------------------------------------------------------------------------------------------|
+| $guard        | The authentication guard.                                                                               |
+| $user         | The user that is currently being authenticated or is authenticated.                                     |
+| $token        | The ApiToken used for authentication. Note that the token will be null for the ApiAuthenticating event. |
+
 
 Example 
 ```
