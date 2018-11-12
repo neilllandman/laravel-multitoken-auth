@@ -3,6 +3,7 @@
 namespace Landman\MultiTokenAuth\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Landman\MultiTokenAuth\Models\ApiClient;
 
 /**
@@ -43,6 +44,14 @@ class ListClients extends Command
      */
     public function handle()
     {
-        $this->table(['Name', 'Api Client ID'], ApiClient::all(['name', 'value'])->toArray());
+        $clients = ApiClient::all(['name', 'value'])->toArray();
+        if (App::environment() !== 'production' && !empty(env('API_TEST_CLIENT_ID'))) {
+            array_push($clients, [
+                'name' => 'API_TEST_CLIENT_ID (From .env)',
+                'value' => env('API_TEST_CLIENT_ID'),
+            ]);
+        }
+        $this->table(['Name', 'Api Client ID'], $clients);
     }
 }
+
