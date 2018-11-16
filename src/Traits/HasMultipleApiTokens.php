@@ -16,7 +16,7 @@ trait HasMultipleApiTokens
      */
     public function apiTokens()
     {
-        return $this->hasMany(ApiToken::class);
+        return $this->hasMany(ApiToken::class, 'user_id');
     }
 
     /**
@@ -37,7 +37,7 @@ trait HasMultipleApiTokens
     }
 
     /**
-     * @return false|\Illuminate\Database\Eloquent\Model
+     * @return false|ApiToken
      */
     public function issueToken()
     {
