@@ -86,14 +86,7 @@ class TokenApp
     private static function makeConfig()
     {
         self::$defaultConfig = require(__DIR__ . "/../../config/multipletokens.php");
-        if (app()->environment() !== 'testing') {
-            // @codeCoverageIgnoreStart
-            self::$config = Config::get(self::CONFIG_SPACE);
-            // @codeCoverageIgnoreEnd
-        } else {
-            self::$config = self::$defaultConfig;
-            self::$config['send_verification_email'] = true;
-        }
+        self::$config = Config::get(self::CONFIG_SPACE);
         self::mergeRouteMappings();
     }
 

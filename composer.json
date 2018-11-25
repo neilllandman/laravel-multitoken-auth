@@ -1,5 +1,6 @@
 {
     "name": "neilllandman/laravel-multitoken-auth",
+    "description": "Multitoken authentication for laravel api's.",
     "autoload": {
         "psr-0" : {
             "Landman\\MultiTokenAuth" : "src"
