@@ -81,7 +81,7 @@ class TokensGuard extends TokenGuard
     public function login(Authenticatable $user, Request $request = null)
     {
         if ($request) {
-            $user_agent = $request->header('user-agent') ?? 'Unknown';
+            $user_agent = $request->input('user_agent') ?? ($request->header('user-agent') ?? 'Unknown');
             $device = $request->input('device') ?? 'Unknown';
         }
 
