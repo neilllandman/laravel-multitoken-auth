@@ -31,6 +31,7 @@ Run migrations:
 `php artisan migrate`
 
 Set the api guard driver and user provider in config/auth.php:
+
 ```php
 'guards' => [
     ...,
@@ -42,6 +43,7 @@ Set the api guard driver and user provider in config/auth.php:
 ```
 
 Add trait to User model: `\Landman\MultiTokenAuth\Traits\HasMultipleApiTokens`
+
 ```php
 class User extends Model {
     use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
@@ -183,6 +185,7 @@ with params:
 ```
 
 Response example: 
+
 ```json
  {
     "user": {
@@ -208,6 +211,7 @@ Getting the current user by calling `/api/auth/user`:
 Authorization Header: `Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV`
 
 Response: 
+
 ```json
 {
   "id": 1,
@@ -226,6 +230,7 @@ Password reset emails are sent using the `sendPasswordResetNotification` functio
 `/api/password/email`
 
 with params: 
+
 ```json
 {
     "client_id": "Api Client ID created via php artisan",
@@ -234,6 +239,7 @@ with params:
 ```
 
 Response example: 
+
 ```json
     
 {
@@ -258,6 +264,7 @@ To further validate if a user can access the API, you can override the `canAcces
 
 
 For example, if you would like to restrict access to your API to allow only users with certain roles:
+
 ```php
 class User extends Model {
 
@@ -336,12 +343,13 @@ Publish config/multipletokens.php: `php artisan vendor:publish`
 <td>login_validation</td>
 <td>Validation rules to use upon login. Note that client_id is always validated.</td>
 <td>
+
 ```php
-[
-    'email' => 'required|email|string',
-    'password' => 'required|string',
-    'device' => 'sometimes|string'
-]
+    [
+        'email' => 'required|email|string',
+        'password' => 'required|string',
+        'device' => 'sometimes|string'
+    ]
 ```
 </td>
 </tr>
@@ -351,8 +359,8 @@ Publish config/multipletokens.php: `php artisan vendor:publish`
 <td>
 
 ```php
-// ['name','email','password']
-```
+    // ['name','email','password']
+``` 
 </td>
 </tr>
 
@@ -368,15 +376,15 @@ false
 <td>register_validation</td>
 <td>Validation rules to use upon registration. If the 'fields' array above is not given, the keys for this array will be used.</td>
 <td>
-```php
-[
-    'name' => 'required|string|min:2',
-    'email' => 'required|email|string|unique:users',
-    'password' => 'required|string|min:12|confirmed',
-    'device' => 'sometimes|string'
-]
-```
 
+```php
+    [
+        'name' => 'required|string|min:2',
+        'email' => 'required|email|string|unique:users',
+        'password' => 'required|string|min:12|confirmed',
+        'device' => 'sometimes|string'
+    ]
+```
 </td>
 </tr>
 
@@ -385,16 +393,13 @@ false
 <td>Whether or not to send an email verification mail using the `sendEmailVerificationNotification` to the user upon registration. Refer to https://laravel.com/docs/5.7/verification</td>
 <td>false</td>
 </tr>
-
-
-
-
 <tr>
 <td>route_middleware</td>
 <td>Middleware applied to all routes.</td>
 <td>
+
 ```php
-['api']
+    ['api']
 ```
 </td>
 </tr>
@@ -402,10 +407,7 @@ false
 <td>route_prefix</td>
 <td>Prefix for all routes.</td>
 <td>
-    
-```php
 'api'
-```
 
 </td>
 </tr>
@@ -413,18 +415,19 @@ false
 <tr>
 <td>route_mappings</td>
 <td>Route mappings. If you would like to change the default route paths, you can do that here.</td>
-<td>
-```php       
-[
-    'login' => '/auth/login',
-    'register' => '/auth/register',
-    'user' => '/auth/user',
-    'devices' => '/auth/user/api-devices',
-    'logout' => '/auth/logout',
-    'logout_all' => '/auth/logout-all',
-    'password_email' => 'password/email',
-    'password_update' => 'password/update'
-]
+<td>     
+
+ ```php
+    [
+        'login' => '/auth/login',
+        'register' => '/auth/register',
+        'user' => '/auth/user',
+        'devices' => '/auth/user/api-devices',
+        'logout' => '/auth/logout',
+        'logout_all' => '/auth/logout-all',
+        'password_email' => 'password/email',
+        'password_update' => 'password/update'
+    ]
 ```
 </td>
 </tr>
@@ -443,6 +446,7 @@ false
 
 ### Via the ListensOnApiEvents Trait
 To hook into the login and register functions, add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
+
 ```php
 class User extends Model {
     use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
@@ -509,6 +513,7 @@ Each of these events expose the following properties:
 
 
 Example 
+
 ```php
 <?php
 
@@ -607,6 +612,7 @@ public function register(Request $request){
 
 The `authenticatedResponse` method accepts one boolean parameter indicating whether a fresh user instance should be 
 retrieved from the database and returns and instance of `\Illuminate\Http\JsonResponse` with structure
+
 ```json
  {
     "user": "[as defined in $user->toApiFormat()]",
