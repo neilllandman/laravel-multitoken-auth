@@ -465,7 +465,7 @@ This trait exposes the following methods, all of which receives the current requ
 
 Example:
 
-```
+```php
 class User extends Model {
     //..
     //..
@@ -509,7 +509,7 @@ Each of these events expose the following properties:
 
 
 Example 
-```
+```php
 <?php
 
 namespace App\Listeners;
