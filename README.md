@@ -16,7 +16,7 @@ A laravel package that allows simple API authentication by using [client ids](#m
 
 Add the following at the bottom of your composer.json to access the repo
 
-```
+```php
 "repositories": [
     {
         "type": "vcs",
@@ -31,7 +31,7 @@ Run migrations:
 `php artisan migrate`
 
 Set the api guard driver and user provider in config/auth.php:
-```
+```php
 'guards' => [
     ...,
     'api' => [
@@ -42,11 +42,13 @@ Set the api guard driver and user provider in config/auth.php:
 ```
 
 Add trait to User model: `\Landman\MultiTokenAuth\Traits\HasMultipleApiTokens`
-```
+```php
 class User extends Model {
     use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
-    .
-    .
+    
+    //..
+    //..
+    
 }
 ```
 
@@ -172,7 +174,7 @@ Some routes are provided by default. Authenticated routes require an Authorizati
 
 with params: 
 
-```
+```json
 {
     "client_id": "Api Client ID created via php artisan",
     "email": "email",
@@ -181,7 +183,7 @@ with params:
 ```
 
 Response example: 
-``` 
+```json
  {
     "user": {
         "id": 1,
@@ -206,16 +208,16 @@ Getting the current user by calling `/api/auth/user`:
 Authorization Header: `Authorization: Bearer EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV`
 
 Response: 
-
-     {
-        "id": 1,
-        "name": "Mrs. Jailyn Boehm",
-        "email": "zemlak.royce@example.org",
-        "email_verified_at": "2018-10-10 12:09:12",
-        "created_at": "2018-10-10 12:09:12",
-        "updated_at": "2018-10-10 12:09:12"
-     }
-
+```json
+{
+  "id": 1,
+  "name": "Mrs. Jailyn Boehm",
+  "email": "zemlak.royce@example.org",
+  "email_verified_at": "2018-10-10 12:09:12",
+  "created_at": "2018-10-10 12:09:12",
+  "updated_at": "2018-10-10 12:09:12"
+}
+```
 
 ### Password reset emails
 
@@ -224,15 +226,15 @@ Password reset emails are sent using the `sendPasswordResetNotification` functio
 `/api/password/email`
 
 with params: 
-```
+```json
 {
     "client_id": "Api Client ID created via php artisan",
-    "email": "email",
+    "email": "email"
 }
 ```
 
 Response example: 
-```
+```json
     
 {
     "message": "We have e-mailed your password reset link!"
@@ -256,11 +258,13 @@ To further validate if a user can access the API, you can override the `canAcces
 
 
 For example, if you would like to restrict access to your API to allow only users with certain roles:
-```
+```php
 class User extends Model {
-    .
-    .
-    .
+
+    //..
+    //..
+    //..
+    
     public function canAccessApi(): bool
     {
         return $this->hasRole(['consumer', 'vendor']);
@@ -272,15 +276,17 @@ class User extends Model {
 If you would like to edit the structure for the user model on API responses, you may override the `toApiFormat()` method available from the `HasMultipleApiTokens` trait.
 This method must return either an instance of the user model or an array.
 
-```
+```php
 class User extends Model {
-    .
-    .
-    .
+
+    //..
+    //..
+    //..
+    
     public function toApiFormat()
     {
         $this->makeHidden(['created_at', 'updated_at']);
-        $this->append('role_names');
+        $this->append('role_names')
         return $this;
     }
 }
@@ -330,12 +336,13 @@ Publish config/multipletokens.php: `php artisan vendor:publish`
 <td>login_validation</td>
 <td>Validation rules to use upon login. Note that client_id is always validated.</td>
 <td>
-
-    [
-        'email' => 'required|email|string',
-        'password' => 'required|string',
-        'device' => 'sometimes|string',
-    ]
+```php
+[
+    'email' => 'required|email|string',
+    'password' => 'required|string',
+    'device' => 'sometimes|string'
+]
+```
 </td>
 </tr>
 <tr>
@@ -343,7 +350,9 @@ Publish config/multipletokens.php: `php artisan vendor:publish`
 <td>The fields that will be passed to the create method of the given Eloquent model. Note that if the password field is present it will be encrypted using bcrypt().</td>
 <td>
 
-    // ['name','email','password'],
+```php
+// ['name','email','password']
+```
 </td>
 </tr>
 
@@ -359,13 +368,15 @@ false
 <td>register_validation</td>
 <td>Validation rules to use upon registration. If the 'fields' array above is not given, the keys for this array will be used.</td>
 <td>
-    
-    [
-        'name' => 'required|string|min:2',
-        'email' => 'required|email|string|unique:users',
-        'password' => 'required|string|min:12|confirmed',
-        'device' => 'sometimes|string',
-    ]
+```php
+[
+    'name' => 'required|string|min:2',
+    'email' => 'required|email|string|unique:users',
+    'password' => 'required|string|min:12|confirmed',
+    'device' => 'sometimes|string'
+]
+```
+
 </td>
 </tr>
 
@@ -382,8 +393,9 @@ false
 <td>route_middleware</td>
 <td>Middleware applied to all routes.</td>
 <td>
-    
-    ['api']
+```php
+['api']
+```
 </td>
 </tr>
 <tr>
@@ -391,7 +403,10 @@ false
 <td>Prefix for all routes.</td>
 <td>
     
-    'api'
+```php
+'api'
+```
+
 </td>
 </tr>
 
@@ -399,17 +414,18 @@ false
 <td>route_mappings</td>
 <td>Route mappings. If you would like to change the default route paths, you can do that here.</td>
 <td>
-        
-    [
-        'login' => '/auth/login',
-        'register' => '/auth/register',
-        'user' => '/auth/user',
-        'devices' => '/auth/user/api-devices',
-        'logout' => '/auth/logout',
-        'logout_all' => '/auth/logout-all',
-        'password_email' => 'password/email',
-        'password_update' => 'password/update',
-    ]
+```php       
+[
+    'login' => '/auth/login',
+    'register' => '/auth/register',
+    'user' => '/auth/user',
+    'devices' => '/auth/user/api-devices',
+    'logout' => '/auth/logout',
+    'logout_all' => '/auth/logout-all',
+    'password_email' => 'password/email',
+    'password_update' => 'password/update'
+]
+```
 </td>
 </tr>
 <tr>
@@ -427,13 +443,15 @@ false
 
 ### Via the ListensOnApiEvents Trait
 To hook into the login and register functions, add the <code>ListensOnApiEvents</code> trait to your user model and override the necessary methods.
-
-    class User extends Model {
-        use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
-        use \Landman\MultiTokenAuth\Traits\ListensOnApiEvents;
-        .
-        .
-    }
+```php
+class User extends Model {
+    use \Landman\MultiTokenAuth\Traits\HasMultipleApiTokens;
+    use \Landman\MultiTokenAuth\Traits\ListensOnApiEvents;
+    
+    //.
+    //.
+}
+```
 
 This trait exposes the following methods, all of which receives the current request as the only parameter and must return the user.
 
@@ -447,24 +465,26 @@ This trait exposes the following methods, all of which receives the current requ
 
 Example:
 
-    class User extends Model {
-        .
-        .
-        .
-        
-        public function afterApiLogin($request)
-        {
-            $this->update(['last_login_at' => now()]);
-            return $this;
-        }
-        
-        public function afterApiRegistered($request)
-        {
-            $this->assignRole($request->input('role'));
-            return $this;
-        }
+```
+class User extends Model {
+    //..
+    //..
+    //..
+    
+    public function afterApiLogin($request)
+    {
+        $this->update(['last_login_at' => now()]);
+        return $this;
     }
- 
+    
+    public function afterApiRegistered($request)
+    {
+        $this->assignRole($request->input('role'));
+        return $this;
+    }
+}
+```
+
 ### Via Event Listeners
 If you would like to register your own listeners, you can attach them to the following events
 
@@ -552,8 +572,8 @@ If you prefer or need to write your own controller methods for login and registr
 You can use the provided guard to log the user in, automatically create a token and return a consistent response.
 
 
-```
-public function login(Request $request){
+```php
+public function login(Request $request) {
     $this->validate($request, [
         'email' => 'required|email',
         'password' => 'required|string'
@@ -573,9 +593,9 @@ public function register(Request $request){
     $this->validate($request, [
         'email' => 'required|email',
         'password' => 'required|string',
-        .
-        .
-        .
+        //..
+        //..
+        //..
     ]);
     ...
     $user = User::create($userData); 
@@ -587,9 +607,9 @@ public function register(Request $request){
 
 The `authenticatedResponse` method accepts one boolean parameter indicating whether a fresh user instance should be 
 retrieved from the database and returns and instance of `\Illuminate\Http\JsonResponse` with structure
-```
+```json
  {
-    "user": [as defined in $user->toApiFormat()],
+    "user": "[as defined in $user->toApiFormat()]",
     "auth": {
             "token": "EYnMURaZ2Q0wWqv4JKYJZtWShqEu6LDk17yKNZwcOuoDaRIsGJXUsXcfBqAV"
         }   
